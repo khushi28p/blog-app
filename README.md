@@ -1,0 +1,1 @@
+This is a Blogging platform where users can publish their writings.
