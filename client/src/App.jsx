@@ -1,11 +1,15 @@
 import { Button } from "./components/ui/button"
+import Navbar from "./components/Navbar"
+import HomePage from "./pages/HomePage"
+import { Routes, Route } from "react-router-dom"
 
 function App() {
 
   return (
     <>
-      <p className='text-8xl font-bold text-green-500'>Working...</p>
-      <Button className="bg-blue-400 text-black">Click me</Button>
+    <Routes>
+      <Route path="/" element={<HomePage/>} />
+      </Routes>
     </>
   )
 }
