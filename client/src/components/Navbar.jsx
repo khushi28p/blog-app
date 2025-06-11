@@ -10,10 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 
 import { SquarePen, Bell, CircleUser, Search } from "lucide-react";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   const isAuthenticated = false;
   const userName = "Jane Doe";
   const userEmail = "jane.doe@example.com";
@@ -104,10 +107,10 @@ const Navbar = () => {
                           <a href="/write" className="text-foreground text-sm font-medium hidden md:inline-block">Write</a>
               <a href="/membership" className="text-foreground text-sm font-medium hidden md:inline-block">Membership</a>
 
-              <Button variant="ghost" className="hidden sm:inline-flex font-semibold">
+              <Button onClick={() => navigate("/login")} variant="ghost" className="hidden sm:inline-flex font-semibold">
                 Sign In
               </Button>
-              <Button className="hidden sm:inline-flex">Get Started</Button>
+              <Button onClick={() => navigate("/signup")} className="hidden sm:inline-flex">Get Started</Button>
             </div>
           )}
         </div>

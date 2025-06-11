@@ -21,7 +21,7 @@ const HomePage = () => {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
             Unleash Your Voice. Share Your Story.
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl ml-auto">
+          <p className="text-md md:text-lg text-muted-foreground mb-8 max-w-2xl ml-auto">
             QuillJot is your effortless platform for creating, sharing, and connecting through compelling blogs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-end">
