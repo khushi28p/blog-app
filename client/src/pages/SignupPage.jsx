@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { Button } from '@/components/ui/button';
@@ -46,20 +47,14 @@ const SignupPage = () => {
   const onSubmit = async (data) => {
     console.log('Signup data:', data);
     try {
-      const response = await new Promise((resolve) => setTimeout(() => {
-        if (data.email !== 'existing@example.com') { 
-          resolve({ success: true, message: 'Account created successfully! Please log in.' });
-        } else {
-          resolve({ success: false, message: 'Email already registered. Please use a different one.' });
-        }
-      }, 1500));
+      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+        personal_info: {fullname: data.fullName,
+        email: data.email,
+        password: data.password}
+      })
 
-      if (response.success) {
-        toast.success(response.message);
-        navigate('/login'); 
-      } else {
-        toast.error(response.message);
-      }
+      toast.success(response.data.message || 'Signup successful!');
+      navigate('/login');
     } catch (error) {
       console.error('Signup error:', error);
       toast.error('An unexpected error occurred. Please try again later.');
