@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -17,8 +17,11 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 
+import { useDispatch, useSelector } from 'react-redux'; 
+import { signupUser } from '@/redux/authSlice';
+
 const signupSchema = z.object({
-  fullName: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
+  fullname: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' })
     .regex(/[A-Z]/, { message: 'Password must contain at least one uppercase letter.' })
@@ -33,11 +36,23 @@ const signupSchema = z.object({
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error, isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      toast.success('Signup successful! You are now logged in.');
+      navigate('/'); 
+    }
+    if (error) {
+      toast.error(error);
+    }
+  }, [isLoggedIn, error, navigate]);
 
   const form = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      fullName: '',
+      fullname: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -46,19 +61,9 @@ const SignupPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
-        personal_info:
-          {
-            fullname: data.fullName,
-          email: data.email,
-          password: data.password,
-      }
-      });
-
-      if(response.status === 200) {
-      toast.success(response.data.message || 'Signup successful!');
+      await dispatch(signupUser(data)).unwrap();
+      toast.success('Account created successfully! Please log in.');
       navigate('/login');
-      }
     } catch (error) {
       console.error('Signup error:', error);
       toast.error('An unexpected error occurred. Please try again later.');
@@ -79,7 +84,7 @@ const SignupPage = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="fullName"
+                name="fullname"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>

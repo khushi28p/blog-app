@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +19,9 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner'; 
 
+import { useDispatch, useSelector } from 'react-redux'; 
+import { loginUser } from '@/redux/authSlice';
+
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
@@ -27,6 +30,18 @@ const loginSchema = z.object({
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+  const { loading, error, isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if(isLoggedIn){
+      toast.success("Login successful!");
+      navigate('/');
+    }
+    if(error){
+      toast.error(error);
+    }
+  }, [isLoggedIn, error, navigate]);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -39,20 +54,7 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
-        personal_info:
-          {
-          email: data.email,
-          password: data.password,
-      }
-      });
-
-      if(response.status === 200) {
-      toast.success(response.data.message || 'Login successful!');
-      navigate('/');
-      }else {
-        toast.error(response.message);
-      }
+      await dispatch(loginUser(data)).unwrap();
     } catch (error) {
       console.error('Login error:', error);
       toast.error('An unexpected error occurred. Please try again later.');
