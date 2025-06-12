@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom'; // Import Link
@@ -16,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner';
+import { toast } from 'sonner'; 
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -37,20 +38,19 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log('Login data:', data);
     try {
-      const response = await new Promise((resolve) => setTimeout(() => {
-        if (data.email === 'test@example.com' && data.password === 'password123') {
-          resolve({ success: true, message: 'Login successful!' });
-        } else {
-          resolve({ success: false, message: 'Invalid credentials. Please try again.' });
-        }
-      }, 1500));
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
+        personal_info:
+          {
+          email: data.email,
+          password: data.password,
+      }
+      });
 
-      if (response.success) {
-        toast.success(response.message);
-        navigate('/'); 
-      } else {
+      if(response.status === 200) {
+      toast.success(response.data.message || 'Login successful!');
+      navigate('/');
+      }else {
         toast.error(response.message);
       }
     } catch (error) {

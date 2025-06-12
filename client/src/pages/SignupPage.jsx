@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner'; 
+import { toast } from 'sonner';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
@@ -45,16 +45,20 @@ const SignupPage = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log('Signup data:', data);
     try {
       const response = await axios.post("http://localhost:5000/api/auth/signup", {
-        personal_info: {fullname: data.fullName,
-        email: data.email,
-        password: data.password}
-      })
+        personal_info:
+          {
+            fullname: data.fullName,
+          email: data.email,
+          password: data.password,
+      }
+      });
 
+      if(response.status === 200) {
       toast.success(response.data.message || 'Signup successful!');
       navigate('/login');
+      }
     } catch (error) {
       console.error('Signup error:', error);
       toast.error('An unexpected error occurred. Please try again later.');
