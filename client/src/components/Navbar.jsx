@@ -11,15 +11,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { SquarePen, Bell, CircleUser, Search } from "lucide-react";
+import { useSelector } from "react-redux";
+import { logout } from "../redux/authSlice.js";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const isAuthenticated = false;
-  const userName = "Jane Doe";
-  const userEmail = "jane.doe@example.com";
+  const {isLoggedIn, user} = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    try{
+    dispatch(logout());
+    navigate("/login");
+    } catch(error){
+      console.error("Logout failed:", error);
+    }
+  }
 
   return (
     <nav className="bg-background border-b border-border py-4 px-20 shadow-sm">
@@ -32,7 +43,7 @@ const Navbar = () => {
             </span>
           </a>
 
-          {isAuthenticated && (
+          {isLoggedIn && (
             <div className="relative flex-grow max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -45,7 +56,7 @@ const Navbar = () => {
         </div>
 
       <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
-          {isAuthenticated ? (
+          {isLoggedIn ? (
             <>
               {/* Write Icon */}
               <Button
@@ -74,7 +85,7 @@ const Navbar = () => {
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar>
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
+                        src={user?.profile_img}
                         alt="User Avatar"
                       />
                       <AvatarFallback>JD</AvatarFallback>
@@ -86,10 +97,10 @@ const Navbar = () => {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {userName}
+                        {user.username}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {userEmail}
+                        {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -97,7 +108,7 @@ const Navbar = () => {
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>

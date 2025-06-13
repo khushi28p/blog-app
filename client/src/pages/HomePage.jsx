@@ -1,13 +1,21 @@
 import React from 'react';
 import { Button } from "@/components/ui/button"; 
 import Navbar from '@/components/Navbar'; 
+import { useSelector } from 'react-redux';
 
 const HomePage = () => {
+  const {isLoggedIn} = useSelector((state) => state.auth);
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-card to-background text-foreground font-inter">
       
       <Navbar />
       {/* Hero Section */}
+      {isLoggedIn ? (
+        <div>
+        <h1 className='text-5xl'>Dashboard</h1>
+      </div>
+      ) :(
+        <div>
       <section className="relative w-full py-20 md:py-32 lg:py-48 bg-gradient-to-r from-primary/10 to-accent/10 flex items-center justify-end px-4 overflow-hidden rounded-b-lg shadow-lg">
         <div className="absolute top-0 left-0 w-full h-full">
           <img
@@ -96,6 +104,7 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
+      </div>)}
     </div>
   );
 };
