@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
+import { upload, uploadImage } from "./controllers/image.controller.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(cors());
 const PORT = process.env.PORT;
 
 app.use("/api/auth", authRoutes);
+app.post("/api/upload-image", upload.single('image'), uploadImage);
 
 app.get("/", (req, res) => {
     res.send("Server running");

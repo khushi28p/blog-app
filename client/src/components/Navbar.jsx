@@ -63,6 +63,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-foreground"
+                onClick={() => navigate("/editor")}
               >
                 <SquarePen className="h-6 w-6" />
                 <span className="sr-only">Write a new blog</span>
