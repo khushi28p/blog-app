@@ -3,19 +3,23 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
-import { upload, uploadImage } from "./controllers/image.controller.js";
+import imageRouter from "./routes/image.routes.js";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 const PORT = process.env.PORT;
 
 app.use("/api/auth", authRoutes);
-app.post("/api/upload-image", upload.single('image'), uploadImage);
+app.use('/api/upload-image', imageRouter)
 
 app.get("/", (req, res) => {
     res.send("Server running");

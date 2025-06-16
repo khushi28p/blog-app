@@ -12,6 +12,25 @@ import LinkExtension from "@tiptap/extension-link";
 import Heading from "@tiptap/extension-heading";
 import Underline from "@tiptap/extension-underline";
 import Blockquote from "@tiptap/extension-blockquote";
+import Placeholder from "@tiptap/extension-placeholder";
+
+import {
+  LuBold,
+  LuItalic,
+  LuUnderline,
+  LuStrikethrough,
+  LuQuote,
+  LuList,
+  LuListOrdered,
+  LuHeading1,
+  LuHeading2,
+  LuHeading3,
+  LuLink,
+  LuImage,
+  LuUndo,
+  LuRedo,
+  LuEraser,
+} from "react-icons/lu";
 
 const BlogEditor = () => {
   const navigate = useNavigate();
@@ -40,12 +59,27 @@ const BlogEditor = () => {
       }),
       Underline,
       Blockquote,
+      Placeholder.configure({
+        placeholder:({node}) => {
+          if(node.type.name === 'heading'){
+            return 'Enter heading...';
+          }
+            return 'Start writing your amazing blog post...';
+        },
+        emptyNodeClass: 'is-empty',
+        emptyEditorClass: 'is-editor-empty',
+      })
     ],
     content: "<p>Start writing your amazing blog post...</p>",
     onUpdate: ({ editor }) => {
       setJsonContent(editor.getJSON());
       setHtmlContent(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class: 'prose dark:prose-invert max-w-none focus:outline-none min-h-[calc(100vh-400px)]',
+      }
+    }
   });
 
   const MenuBar = ({ editor }) => {
@@ -65,7 +99,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Bold
+        <LuBold className="w-4 h-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -76,7 +110,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Italic
+        <LuItalic className="w-4 h-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -87,7 +121,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Underline
+        <LuUnderline className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -98,7 +132,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Strike
+        <LuStrikethrough className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
@@ -110,7 +144,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Blockquote
+        <LuQuote className="h-4 w-4" />
       </Button>
 
       {/* Lists */}
@@ -124,7 +158,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Bullet List
+        <LuList className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -136,7 +170,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Ordered List
+        <LuListOrdered className="h-4 w-4" />
       </Button>
 
       {/* Headings (Example - you can add a dropdown for this later) */}
@@ -150,7 +184,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        H1
+        <LuHeading1 className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -162,7 +196,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        H2
+        <LuHeading2 className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
@@ -174,7 +208,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        H3
+        <LuHeading3 className="h-4 w-4" />
       </Button>
 
       {/* Link Button */}
@@ -204,7 +238,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Link
+        <LuLink className="h-4 w-4" />
       </Button>
 
       {/* Image Upload Button */}
@@ -213,7 +247,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Image
+        <LuImage className="h-4 w-4" />
       </Button>
 
       {/* Undo/Redo */}
@@ -223,7 +257,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Undo
+        <LuUndo className="h-4 w-4" />
       </Button>
       <Button
         onClick={() => editor.chain().focus().redo().run()}
@@ -231,7 +265,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Redo
+        <LuRedo className="h-4 w-4" />
       </Button>
       <Button
         onClick={() =>
@@ -240,7 +274,7 @@ const BlogEditor = () => {
         variant="ghost"
         size="sm"
       >
-        Clear Formatting
+        <LuEraser className="h-4 w-4" />
       </Button>
     </div>
   );

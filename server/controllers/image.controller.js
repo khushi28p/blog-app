@@ -1,40 +1,14 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import multer from 'multer';
-import dotenv from 'dotenv';
+import AppError from '../utils/appError.js';
 
-dotenv.config();
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
-});
-
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params:{
-        folder: 'images',
-        allowed_formats: ['jpg', 'png', 'jpeg'],
-        public_id: (req, file) => `blog-image-${Date.now()}-${file.originalname.split('.')[0]}`,
-    }
-})
-
-const upload = multer({storage:storage});
-
-export const uploadImage = (req, res) =>{
+export const uploadImage = (req, res, next) =>{
     if(!req.file){
-        return res.status(400).json({
-            message: 'Np image uploaded'
-        })
+        return next(new AppError('No image file uploaded or an error occurred during upload processing.', 400));
     }
 
     res.status(200).json({
+        status: 'success',
         message: 'Image Uploaded successfully',
         url: req.file.path,
         public_id: req.file.filename
     })
 }
-
-export {upload};
