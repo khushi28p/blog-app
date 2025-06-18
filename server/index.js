@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
 import imageRouter from "./routes/image.routes.js";
+import blogRouter from "./routes/blog.routes.js";
 
 dotenv.config();
 
@@ -19,7 +20,8 @@ app.use(cors({
 const PORT = process.env.PORT;
 
 app.use("/api/auth", authRoutes);
-app.use('/api/upload-image', imageRouter)
+app.use('/api/upload-image', imageRouter);
+app.use("/api/blog", blogRouter)
 
 app.get("/", (req, res) => {
     res.send("Server running");

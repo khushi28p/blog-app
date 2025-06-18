@@ -89,7 +89,7 @@
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted-foreground: oklch(66.86% 0.01186 17.103);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
@@ -113,6 +113,43 @@
 
 .prose {
   color: var(--foreground);
+}
+
+.ProseMirror.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h1.is-empty::before,
+.ProseMirror h2.is-empty::before,
+.ProseMirror h3.is-empty::before,
+.ProseMirror h4.is-empty::before,
+.ProseMirror h5.is-empty::before,
+.ProseMirror h6.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground); 
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror :not(li):empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground); 
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror .is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--muted-foreground); 
+    pointer-events: none;
+    height: 0;
 }
 
 .prose a {
