@@ -1,31 +1,25 @@
-// src/components/BlogEditor.jsx
-
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
-import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 
-// --- START: Tiptap Extensions required by EditorMenubar ---
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
-import TextAlign from '@tiptap/extension-text-align'; // For LuAlignLeft, LuAlignCenter, LuAlignRight, LuAlignJustify
-import Link from '@tiptap/extension-link';           // For LuLink
-import Table from '@tiptap/extension-table';         // For LuTable and table actions
+import TextAlign from '@tiptap/extension-text-align'; 
+import Link from '@tiptap/extension-link';          
+import Table from '@tiptap/extension-table';         
 import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
-import Subscript from '@tiptap/extension-subscript'; // For LuSubscript
-import Superscript from '@tiptap/extension-superscript'; // For LuSuperscript
-import HorizontalRule from '@tiptap/extension-horizontal-rule'; // For LuMinus (horizontal rule)
-// --- END: Tiptap Extensions required by EditorMenubar ---
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript'; 
+import HorizontalRule from '@tiptap/extension-horizontal-rule'; 
 
 import EditorMenubar from "./EditorMenubar";
 import EditorNavbar from "./EditorNavbar";
@@ -45,19 +39,18 @@ const extensions = [
             return 'Write something amazing…';
         },
     }),
-    // --- ADD THESE EXTENSIONS ---
     Underline,
-    Highlight.configure({ multicolor: true }), // Often configured to allow different highlight colors
+    Highlight.configure({ multicolor: true }),
     TextAlign.configure({
-        types: ['heading', 'paragraph'], // Apply alignment to headings and paragraphs
+        types: ['heading', 'paragraph'],
     }),
     Link.configure({
-        openOnClick: false, // Don't open link on click, allow editing
-        autolink: true, // Automatically turn URLs into links
-        defaultProtocol: 'https', // Default protocol for links
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: 'https',
     }),
     Table.configure({
-        resizable: true, // Allow resizing table columns
+        resizable: true,
     }),
     TableRow,
     TableHeader,
@@ -65,16 +58,15 @@ const extensions = [
     Subscript,
     Superscript,
     HorizontalRule,
-    // --- END ADDITIONS ---
 ];
 
 const BlogEditor = () => {
-    // ... (rest of your component code remains the same)
     const [title, setTitle] = useState('');
     const [bannerFile, setBannerFile] = useState(null);
     const [bannerImageUrl, setBannerImageUrl] = useState('');
     const [loadingBanner, setLoadingBanner] = useState(false);
     const [showBannerInput, setShowBannerInput] = useState(false);
+    const [currentDraftId, setCurrentDraftId] = useState(null);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -85,7 +77,7 @@ const BlogEditor = () => {
         extensions,
         content: '<p></p>',
         onUpdate: ({ editor }) => {
-            // Optional: You can dispatch updates to Redux here if you want to save content as user types
+
         },
     });
 
@@ -172,17 +164,27 @@ const BlogEditor = () => {
             const token = localStorage.getItem('userToken');
             const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
-            const response = await axios.post("http://localhost:5000/api/blog/save-draft", {
+            const dataToSave = {
                 title,
                 jsonContent: editor.getJSON(),
                 banner: showBannerInput ? bannerImageUrl : '',
                 des: extractPlainTextDescription(editor.getHTML(), 180),
-                tags: [],
-            }, config);
+                tags: [], 
+            };
+
+            if(currentDraftId){
+                dataToSave.blog_id = currentDraftId;
+            }
+
+            const response = await axios.post("http://localhost:5000/api/blog/save-draft", dataToSave, config);
 
             toast.dismiss('save-draft');
             toast.success(response.data.message || "Draft saved!");
             console.log("Draft Data:", response.data.draft);
+
+            if (response.data.draft && response.data.draft.blog_id) {
+                setCurrentDraftId(response.data.draft.blog_id);
+            }
         } catch (error) {
             toast.dismiss('save-draft');
             console.error("Error saving draft:", error.response?.data?.message || error.message);
@@ -204,69 +206,67 @@ const BlogEditor = () => {
                 handleSaveDraft={handleSaveDraftClick}
                 handlePublish={handlePublishClick}
             />
-            <div className="container mx-auto py-8">
-                <Card className="max-w-4xl mx-auto p-6 shadow-lg">
-                    <CardContent className="space-y-6">
-                        <div className="flex items-center gap-2">
-                            <Input
-                                type="text"
-                                placeholder="Blog Title"
-                                value={title}
-                                onChange={handleTitleChange}
-                                className="text-3xl font-bold p-4 border-b-2 focus:outline-none focus:border-blue-500 flex-grow"
-                            />
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={toggleBannerInput}
-                                className="shrink-0"
-                                title={showBannerInput ? "Hide Banner Input" : "Add Banner Image"}
-                            >
-                                {showBannerInput ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-                                ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                )}
-                            </Button>
-                        </div>
-
-                        {showBannerInput && (
-                            <div className="relative w-full h-60 border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                                {bannerImageUrl ? (
-                                    <img src={bannerImageUrl} alt="Banner" className="w-full h-full object-cover" />
-                                ) : loadingBanner ? (
-                                    <p>Uploading banner...</p>
-                                ) : (
-                                    <p className="text-gray-500">No banner image selected</p>
-                                )}
-                                <input
-                                    type="file"
-                                    ref={bannerInputRef}
-                                    onChange={handleBannerFileChange}
-                                    accept="image/*"
-                                    className="hidden"
-                                />
-                                <Button
-                                    onClick={handleBannerUploadClick}
-                                    className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white"
-                                    disabled={loadingBanner}
-                                >
-                                    {loadingBanner ? 'Uploading...' : 'Upload Banner'}
-                                </Button>
-                            </div>
+            <div className="container max-w-4xl mx-auto py-8 p-6 space-y-4">
+                
+                <div className="flex items-center gap-2">
+                    <Input
+                        type="text"
+                        placeholder="Blog Title"
+                        value={title}
+                        onChange={handleTitleChange}
+                        className="text-3xl font-bold p-4 border-b-2 focus:outline-none focus:border-blue-500 flex-grow"
+                    />
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleBannerInput}
+                        className="shrink-0"
+                        title={showBannerInput ? "Hide Banner Input" : "Add Banner Image"}
+                    >
+                        {showBannerInput ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
                         )}
+                    </Button>
+                </div>
 
-                        <EditorMenubar editor={editor} />
+                {showBannerInput && (
+                    <div className="relative w-full h-60 border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                        {bannerImageUrl ? (
+                            <img src={bannerImageUrl} alt="Banner" className="w-full h-full object-cover" />
+                        ) : loadingBanner ? (
+                            <p>Uploading banner...</p>
+                        ) : (
+                            <p className="text-gray-500">No banner image selected</p>
+                        )}
+                        <input
+                            type="file"
+                            ref={bannerInputRef}
+                            onChange={handleBannerFileChange}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                        <Button
+                            onClick={handleBannerUploadClick}
+                            className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white"
+                            disabled={loadingBanner}
+                        >
+                            {loadingBanner ? 'Uploading...' : 'Upload Banner'}
+                        </Button>
+                    </div>
+                )}
 
-                        <div className="border rounded-lg p-4 min-h-[300px] overflow-auto editor-content">
-                            <EditorContent editor={editor} />
-                        </div>
-                    </CardContent>
-                </Card>
+                <EditorMenubar editor={editor} />
+
+                <div className="prose max-w-none border rounded-lg p-4 min-h-[300px] overflow-auto editor-content">
+                    <EditorContent editor={editor} />
+                </div>
+                
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
-// src/pages/PublishPage.jsx
+// src/pages/PublishPage.jsx - No changes needed based on your description.
+// (Content remains as provided previously)
 
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -28,7 +29,6 @@ const PublishPage = () => {
 
     const [tagsInput, setTagsInput] = useState(tags.join(', '));
     const [localDescription, setLocalDescription] = useState(description);
-
 
     useEffect(() => {
         if (!title && !htmlContent) {
@@ -69,7 +69,7 @@ const PublishPage = () => {
 
         dispatch(updatePublishTags(processedTags));
 
-        if (!title.trim() || !jsonContent || jsonContent.length === 0 || !localDescription.trim()) {
+        if (!title.trim() || !jsonContent || jsonContent.content.length === 0 || !localDescription.trim()) {
             toast.error("Title, content, and description cannot be empty.");
             return;
         }
@@ -86,7 +86,7 @@ const PublishPage = () => {
 
             const response = await axios.post("http://localhost:5000/api/blog/publish-blog", {
                 title: title,
-                banner: bannerImageUrl, // Backend expects 'banner'
+                banner: bannerImageUrl,
                 des: localDescription,
                 content: jsonContent,
                 tags: processedTags,
@@ -95,15 +95,15 @@ const PublishPage = () => {
             toast.dismiss('final-publish');
             toast.success(response.data.message || "Blog published successfully!");
             console.log("Final Published Data:", response.data.blog);
-
-            dispatch(clearPublishData());
             navigate("/");
+            dispatch(clearPublishData());
+            
         } catch (error) {
             toast.dismiss('final-publish');
             console.error("Error publishing blog:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to publish blog.");
             if (error.response?.status === 401) {
-                localStorage.removeItem('userToken'); // Corrected key
+                localStorage.removeItem('userToken');
                 navigate("/login");
             }
         }

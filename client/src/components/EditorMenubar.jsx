@@ -149,7 +149,7 @@ const EditorMenuBar = ({ editor}) => {
       <Button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={
-          editor.isActive("blockquote") ? "bg-primary text-secondary" : ""
+          editor.isActive("blockquote") ? "bg-primary text-secondary" : "" 
         }
         variant="ghost"
         size="sm"

@@ -48,7 +48,7 @@ export const publishBlog = async( req, res) => {
 }
 
 export const saveDraft = async(req, res) => {
-    const { blog_id, title, content, bannerImageUrl, des, tags } = req.body;
+    const { blog_id, title, content, banner, des, tags } = req.body;
 
     if (!title && (!content || content.content.length === 0)) {
         return res.status(400).json({ message: 'At least a title or some content is required to save a draft.' });
@@ -56,27 +56,26 @@ export const saveDraft = async(req, res) => {
 
     try {
         let draftPost;
-        const authorId = getAuthUserId();
+        const authorId = req.user._id;
         if (blog_id) {
-            draftPost = await Blog.findOneAndUpdate(
-                { blog_id: blog_id, author: authorId, draft: true }, // Ensure it's the author's draft
+            draftPost = await blogModel.findOneAndUpdate(
+                { blog_id: blog_id, author: authorId, draft: true }, 
                 {
                     title,
                     banner: banner || null,
                     des: des || '',
                     content: content,
                     tags: tags || [],
-                    draft: true, // Keep it as a draft
+                    draft: true, 
                 },
-                { new: true, runValidators: true } // Return the updated document, run schema validators
+                { new: true, runValidators: true } 
             );
 
             if (!draftPost) {
                 return res.status(404).json({ message: 'Draft not found or unauthorized to update.' });
             }
         } else {
-            // Create a new draft
-            draftPost = new Blog({
+            draftPost = await blogModel.create({
                 blog_id: generateUniqueBlogId(),
                 title,
                 banner: banner || null,
@@ -86,7 +85,6 @@ export const saveDraft = async(req, res) => {
                 author: authorId,
                 draft: true,
             });
-            await draftPost.save();
         }
 
         res.status(201).json({ message: 'Draft saved successfully!', draft: draftPost });
@@ -101,7 +99,7 @@ export const saveDraft = async(req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const allPosts = await Blog.find({}); // You might want to filter by draft: false for published posts
+        const allPosts = await blogModel.find({}); 
         res.json(allPosts);
     } catch (error) {
         console.error('Error fetching posts:', error);

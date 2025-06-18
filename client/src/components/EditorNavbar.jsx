@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import React from "react"; // Explicitly import React
 
 const EditorNavbar = ({
-    // Props are now actually passed and used
-    title,          // Although title/setTitle are not used within EditorNavbar itself,
-    setTitle,       // they are present in the prop signature from your previous version.
     handleSaveDraft,
     handlePublish,
 }) => {
@@ -18,11 +15,11 @@ const EditorNavbar = ({
                 <Button
                     variant="secondary"
                     className="rounded-full"
-                    onClick={handleSaveDraft} // Now correctly wired
+                    onClick={handleSaveDraft} 
                 >
                     Save as draft
                 </Button>
-                <Button className="rounded-full" onClick={handlePublish}> {/* Now correctly wired */}
+                <Button className="rounded-full" onClick={handlePublish}>
                     Publish
                 </Button>
             </div>
