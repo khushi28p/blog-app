@@ -127,7 +127,7 @@
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  margin-top: 1.5em; /* Add space above headings */
+  margin-top: 0.5em; /* Add space above headings */
   margin-bottom: 0.5em; /* Add space below headings */
   line-height: 1.2;
   font-weight: 700; /* Make them bold */
