@@ -111,6 +111,94 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.prose {
+  color: var(--foreground);
+}
+
+.prose a {
+  color: var(--primary); /* Use your primary color for links */
+  text-decoration: underline; /* Add an underline for clarity */
+  cursor: pointer; /* Ensure pointer cursor on hover */
+  /* Add hover states if desired */
+  &:hover {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  margin-top: 1.5em; /* Add space above headings */
+  margin-bottom: 0.5em; /* Add space below headings */
+  line-height: 1.2;
+  font-weight: 700; /* Make them bold */
+  color: var(--foreground); /* Ensure they use your text color */
+}
+
+.prose h1 { font-size: 2.25em; } /* Equivalent to Tailwind's text-4xl */
+.prose h2 { font-size: 1.875em; } /* Equivalent to Tailwind's text-3xl */
+.prose h3 { font-size: 1.5em; }  /* Equivalent to Tailwind's text-2xl */
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse; /* Ensure cells collapse borders */
+  margin-top: 1em; /* Add some vertical spacing */
+  margin-bottom: 1em;
+  background-color: var(--background); /* Match your background */
+  color: var(--foreground); /* Match your text color */
+}
+
+.prose table th,
+.prose table td {
+  border: 1px solid var(--border); /* Use your theme's border color */
+  padding: 0.5em 0.75em; /* Padding inside cells */
+  text-align: left; /* Align text left */
+  vertical-align: top; /* Align cell content to top */
+}
+
+.prose table th {
+  background-color: var(--secondary); /* A slightly different background for headers */
+  font-weight: 600; /* Bold headers */
+}
+
+.prose :not(pre) > code {
+  background-color: var(--muted); /* Light background for inline code */
+  color: var(--muted-foreground); /* Text color */
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em; /* Slightly smaller font for inline */
+  white-space: nowrap; /* Prevent inline code from wrapping */
+  font-family: monospace; /* Ensure monospace font */
+}
+
+.prose pre {
+  background-color: var(--secondary); /* A distinct background for blocks */
+  color: var(--card-foreground); /* Light text color for blocks */
+  padding: 1em;
+  border-radius: 0.375rem;
+  overflow-x: auto; /* Allow horizontal scrolling for long lines */
+  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace; /* Preferred monospace font */
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.prose pre code {
+  background-color: transparent; /* Don't apply background again */
+  color: inherit; /* Inherit color from pre */
+  padding: 0;
+  border-radius: 0;
+  font-size: 1em; /* Reset font size for consistency within pre */
+  white-space: pre-wrap; /* Allow wrapping within the code block */
+}
+
+.prose blockquote {
+  border-left: 0.25em solid var(--primary); /* A distinct left border */
+  padding-left: 1em;
+  font-style: italic;
+  color: var(--muted-foreground); /* Slightly subdued text color */
+} 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
