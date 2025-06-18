@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button"; 
 import Navbar from '@/components/Navbar'; 
 import { useSelector } from 'react-redux';
+import Dashboard from './Dashboard';
 
 const HomePage = () => {
   const {isLoggedIn} = useSelector((state) => state.auth);
@@ -11,9 +12,7 @@ const HomePage = () => {
       <Navbar />
       {/* Hero Section */}
       {isLoggedIn ? (
-        <div>
-        <h1 className='text-5xl'>Dashboard</h1>
-      </div>
+        <Dashboard />
       ) :(
         <div>
       <section className="relative w-full py-20 md:py-32 lg:py-48 bg-gradient-to-r from-primary/10 to-accent/10 flex items-center justify-end px-4 overflow-hidden rounded-b-lg shadow-lg">

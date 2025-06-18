@@ -1,4 +1,5 @@
 import blogModel from "../models/blog.model.js";
+import userModel from '../models/user.model.js'
 import { generateUniqueBlogId } from "../utils/generateBlogId.js";
 
 export const publishBlog = async( req, res) => {
@@ -99,10 +100,44 @@ export const saveDraft = async(req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const allPosts = await blogModel.find({}); 
-        res.json(allPosts);
+        const allPosts = await blogModel.find({draft: false}).populate('author', '_id personal_info.username personal_info.email personal_info.profile_img').sort({createdAt: -1}); 
+        const postsWithActivityCounts = allPosts.map(post => {
+            const postObj = post.toObject();
+            return {
+                ...postObj,
+                likesCount: postObj.activity?.total_likes || 0,
+                commentsCount: postObj.activity?.total_comments || 0,
+            };
+        });
+
+        console.log(postsWithActivityCounts)
+        res.json(postsWithActivityCounts);
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: 'Failed to fetch posts.', error: error.message });
     }
 };
+
+export const getTrendingTags = async(req, res) => {
+    try{
+        const trendingTags = await blogModel.aggregate([
+            {$match: {draft: false}},
+            {$unwind: '$tags'},
+            {$group:{
+                _id: '$tags',
+                count: {$sum: 1}
+            }},
+            {$sort: {count: -1}},
+            {$limit: 10},
+            {$project: {_id: 0, tag: "$_id"}}
+        ]);
+
+        const tags = trendingTags.map(item => item.tag);
+
+        res.json(tags);
+    }
+    catch (error) {
+        console.error('Error fetching trending tags:', error);
+        res.status(500).json({ message: 'Failed to fetch trending tags.', error: error.message });
+    }
+}
