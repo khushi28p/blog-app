@@ -206,15 +206,15 @@ const BlogEditor = () => {
                 handleSaveDraft={handleSaveDraftClick}
                 handlePublish={handlePublishClick}
             />
-            <div className="container max-w-4xl mx-auto py-8 p-6 space-y-4">
+            <div className="container max-w-3xl mx-auto py-8 px-6 space-y-4">
                 
                 <div className="flex items-center gap-2">
                     <Input
                         type="text"
                         placeholder="Blog Title"
-                        value={title}
+                        value={title}   
                         onChange={handleTitleChange}
-                        className="text-3xl font-bold p-4 border-b-2 focus:outline-none focus:border-blue-500 flex-grow"
+                        className="font-bold p-4 border-b-2 focus:outline-none focus:border-blue-500 flex-grow"
                     />
                     <Button
                         variant="ghost"

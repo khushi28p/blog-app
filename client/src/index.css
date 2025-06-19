@@ -236,6 +236,16 @@
   color: var(--muted-foreground); /* Slightly subdued text color */
 } 
 
+.carousel-card-hover-effect:hover {
+  transform: translateY(-5px) scale(1.01); /* Lift slightly and scale */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(128, 0, 128, 0.1); /* Stronger, tinted shadow */
+}
+
+.horizontal-card-hover-effect:hover {
+  transform: translateX(8px) scale(1.01); /* Slide right and scale */
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

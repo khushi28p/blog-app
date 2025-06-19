@@ -110,13 +110,67 @@ export const getAllPosts = async (req, res) => {
             };
         });
 
-        console.log(postsWithActivityCounts)
         res.json(postsWithActivityCounts);
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: 'Failed to fetch posts.', error: error.message });
     }
 };
+
+export const getTrendingPosts = async(req, res) => {
+    try {
+        const trendingPosts = await blogModel.aggregate([
+            {$match: {draft: false}},
+            {
+                $addFields: {
+                    trendingScore: {
+                        $add: [
+                            {$multiply: ["$activity.total_reads", 0.5]},
+                            {$multiply: ["$activity.total_likes", 0.3]},
+                            {$multiply: ["$activity.total_comments", 0.2]}
+                        ]
+                    }
+                }
+            },
+            {$sort: {trendingScore: -1, publishedAt: -1}},
+            {$limit: 10},
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'author._id',
+                    foreignField: '_id',
+                    as: 'authorInfo'
+                }
+            },
+            {
+                $unwind: '$authorInfo'
+            },
+            {
+                $project: {
+                    blog_id: 1,
+                    title: 1,
+                    banner: 1,
+                    des: 1,
+                    content: 1,
+                    tags: 1,
+                    'author._id': '$authorInfo._id',
+                    'author.personal_info.username' : '$authorInfo.personal_info.username',
+                    'author.personal_info.email': '$authorInfo.personal_info.email',
+                    'author.personal_info.profile_img': '$authorInfo.personal_info.profile_img',
+                    activity: 1,
+                    likesCount: '$activity.total_likes',
+                    commentsCount: '$activity.total_comments',
+                    publishedAt: 1,
+                }
+            }
+        ]);
+
+        res.json(trendingPosts);
+    } catch(error){
+        console.error('Error fetchign trending posts', error);
+        res.status(500).json({message: 'Failed to fetch trending posts', error: error.message});
+    }
+}
 
 export const getTrendingTags = async(req, res) => {
     try{
