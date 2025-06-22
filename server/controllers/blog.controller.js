@@ -195,3 +195,21 @@ export const getTrendingTags = async(req, res) => {
         res.status(500).json({ message: 'Failed to fetch trending tags.', error: error.message });
     }
 }
+
+export const getBlog = async(req, res) => {
+    try{
+        const blogId = req.params.id;
+        const post = await blogModel.findOne({blog_id: blogId}).populate('author', 'personal_info.username personal_info.profile_img');
+
+        if (!post) {
+            return res.status(404).json({ message: 'Blog post not found' });
+        }
+        res.json(post);
+    }catch (err) {
+        console.error(err);
+        if (err.kind === 'ObjectId') {
+            return res.status(400).json({ message: 'Invalid blog ID' });
+        }
+        res.status(500).json({ message: 'Server error' });
+    }
+}

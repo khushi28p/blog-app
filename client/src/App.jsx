@@ -7,6 +7,7 @@ import Editor from "./pages/Editor"
 import PublishPage from "./pages/PublishPage"
 import React from "react"
 import { Routes, Route } from "react-router-dom"
+import BlogPage from "./pages/BlogPage"
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
       <Route path="/signup" element={<SignupPage/>} />
       <Route path="/editor" element={<Editor/>} />
       <Route path="/publish" element={<PublishPage /> } />
+      <Route path="/blog/:blogId" element={<BlogPage />} /> 
       <Route path="*" element={<p>404 Not Found</p>} />
       </Routes>
     </>
