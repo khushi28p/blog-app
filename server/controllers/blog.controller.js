@@ -1,5 +1,5 @@
-import blogModel from "../models/blog.model.js";
-import userModel from '../models/user.model.js'
+import Blogs from "../models/blog.model.js";
+import Users from "../models/user.model.js"
 import { generateUniqueBlogId } from "../utils/generateBlogId.js";
 
 export const publishBlog = async( req, res) => {
@@ -20,7 +20,7 @@ export const publishBlog = async( req, res) => {
     }
 
     try{
-        const newBlogPost = await blogModel.create({
+        const newBlogPost = await Blogs.create({
             blog_id: generateUniqueBlogId(),
             title: title,
             banner: banner || null,
@@ -59,7 +59,7 @@ export const saveDraft = async(req, res) => {
         let draftPost;
         const authorId = req.user._id;
         if (blog_id) {
-            draftPost = await blogModel.findOneAndUpdate(
+            draftPost = await Blogs.findOneAndUpdate(
                 { blog_id: blog_id, author: authorId, draft: true }, 
                 {
                     title,
@@ -76,7 +76,7 @@ export const saveDraft = async(req, res) => {
                 return res.status(404).json({ message: 'Draft not found or unauthorized to update.' });
             }
         } else {
-            draftPost = await blogModel.create({
+            draftPost = await Blogs.create({
                 blog_id: generateUniqueBlogId(),
                 title,
                 banner: banner || null,
@@ -100,7 +100,7 @@ export const saveDraft = async(req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const allPosts = await blogModel.find({draft: false}).populate('author', '_id personal_info.username personal_info.email personal_info.profile_img').sort({createdAt: -1}); 
+        const allPosts = await Blogs.find({draft: false}).populate('author', '_id personal_info.username personal_info.email personal_info.profile_img').sort({createdAt: -1}); 
         const postsWithActivityCounts = allPosts.map(post => {
             const postObj = post.toObject();
             return {
@@ -119,7 +119,7 @@ export const getAllPosts = async (req, res) => {
 
 export const getTrendingPosts = async(req, res) => {
     try {
-        const trendingPosts = await blogModel.aggregate([
+        const trendingPosts = await Blogs.aggregate([
             {$match: {draft: false}},
             {
                 $addFields: {
@@ -174,7 +174,7 @@ export const getTrendingPosts = async(req, res) => {
 
 export const getTrendingTags = async(req, res) => {
     try{
-        const trendingTags = await blogModel.aggregate([
+        const trendingTags = await Blogs.aggregate([
             {$match: {draft: false}},
             {$unwind: '$tags'},
             {$group:{
@@ -199,12 +199,19 @@ export const getTrendingTags = async(req, res) => {
 export const getBlog = async(req, res) => {
     try{
         const blogId = req.params.id;
-        const post = await blogModel.findOne({blog_id: blogId}).populate('author', 'personal_info.username personal_info.profile_img');
+        const blog = await Blogs.findOne({blog_id: blogId}).populate('author', 'personal_info.username personal_info.profile_img');
 
-        if (!post) {
+        if (!blog) {
             return res.status(404).json({ message: 'Blog post not found' });
         }
-        res.json(post);
+
+        await Blogs.findOneAndUpdate(
+            {blog_id: blogId},
+            {$inc: {'activity.total_reads': 1}},
+            {new: true}
+        )
+
+        res.json(blog);
     }catch (err) {
         console.error(err);
         if (err.kind === 'ObjectId') {

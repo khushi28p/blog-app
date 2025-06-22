@@ -4,12 +4,12 @@ const commentSchema = mongoose.Schema({
     blog_id: {
         type: Schema.Types.ObjectId,
         required:true,
-        ref: "blogs"
+        ref: "Blogs"
     },
     blog_author:{
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "blogs",
+        ref: "Blogs",
     },
     comment: {
         type: String,
@@ -17,20 +17,20 @@ const commentSchema = mongoose.Schema({
     },
     children: {
         type:[Schema.Types.ObjectId],
-        ref: "comments"
+        ref: "Comments"
     },
     commented_by: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "users"
+        ref: "Users"
     },
     isReply: {
         type:Boolean
     },
     parent: {
         type: Schema.Types.ObjectId,
-        ref: "comments"
+        ref: "Comments"
     }
 }, {timestamps: {createdAt: 'commentedAt'}});
 
-export default mongoose.model("comments", commentSchema);
+export default mongoose.model("Comments", commentSchema);

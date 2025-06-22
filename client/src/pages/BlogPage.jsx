@@ -19,7 +19,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Navbar from '@/components/Navbar';
 
 const displayExtensions = [
     StarterKit,
@@ -48,7 +48,6 @@ const displayExtensions = [
     TableCell,
     Subscript,
     Superscript,
-    HorizontalRule,
 ];
 
 const BlogPage = () => {
@@ -66,9 +65,7 @@ const BlogPage = () => {
 
                 const response = await axios.get(`http://localhost:5000/api/blog/posts/${blogId}`);
                 setPost(response.data);
-                console.log("Fetched Post Data:", response.data);
             } catch (err) {
-                console.error('Error fetching blog post:', err);
                 setError(err.response?.data?.message || 'Failed to load blog post.');
                 toast.error(err.response?.data?.message || 'Failed to load blog post.');
             } finally {
@@ -129,6 +126,8 @@ const BlogPage = () => {
     }
 
     return (
+        <div>
+        <Navbar/>
         <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 bg-white shadow-lg rounded-lg my-8">
             {post.banner && (
                 <img
@@ -188,7 +187,11 @@ const BlogPage = () => {
                     <MessageSquare className="w-5 h-5 text-blue-500" />
                     <span className="font-medium">{post.activity.total_comments || 0} Comments</span>
                 </div>
+                <div className="flex items-center gap-2">
+                    <span className="font-medium">{post.activity.total_reads || 0} reads</span>
+                </div>
             </div>
+        </div>
         </div>
     );
 };

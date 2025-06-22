@@ -19,7 +19,6 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript'; 
-import HorizontalRule from '@tiptap/extension-horizontal-rule'; 
 
 import EditorMenubar from "./EditorMenubar";
 import EditorNavbar from "./EditorNavbar";
@@ -57,7 +56,6 @@ const extensions = [
     TableCell,
     Subscript,
     Superscript,
-    HorizontalRule,
 ];
 
 const BlogEditor = () => {

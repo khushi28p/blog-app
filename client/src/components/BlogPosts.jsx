@@ -79,7 +79,7 @@ const BlogPosts = () => {
 
     return (
         <div className="relative overflow-hidden min-h-screen bg-white px-6 sm:px-10">
-            {/* Background blob divs */}
+            
             <div className="absolute top-0 left-0 w-64 h-64 bg-gray-100 opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob -translate-x-1/4 -translate-y-1/4"></div>
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-gray-100 opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000 translate-x-1/4 -translate-y-1/4"></div>
             <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-gray-100 opacity-20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000 -translate-x-1/2 -translate-y-1/2"></div>
@@ -191,7 +191,7 @@ const BlogPosts = () => {
                                     </Link>
                                 )}
                                 <div className="flex-grow p-5 flex flex-col justify-between">
-                                    <CardHeader className="p-0 pb-2 flex-shrink-0"> {/* Added flex-shrink-0 */}
+                                    <CardHeader className="p-0 pb-2 flex-shrink-0"> 
                                         <Link to={`/blog/${post.blog_id || post._id}`}>
                                             <CardTitle className="text-xl font-bold text-gray-900 line-clamp-2 font-sans hover:text-blue-600 transition-colors duration-200">{post.title}</CardTitle>
                                         </Link>
@@ -218,9 +218,8 @@ const BlogPosts = () => {
                                         )}
                                         <p className="text-gray-700 text-sm line-clamp-3 mt-3 font-sans leading-relaxed">{post.des}</p>
                                     </CardHeader>
-                                    <CardContent className="p-0 flex-grow"> {/* Changed flex-grow-0 to flex-grow to allow content to expand */}
+                                    <CardContent className="p-0 flex-grow"> 
                                         {post.tags && post.tags.length > 0 && (
-                                            // Hide tags on 'lg' screens and above
                                             <div className="flex flex-wrap gap-2 md:hidden"> 
                                                 {post.tags.map((tag, i) => (
                                                     <span key={`${post._id}-tag-${i}`} className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full font-semibold border border-blue-100 hover:bg-blue-100 transition-colors duration-200 cursor-pointer">

@@ -9,29 +9,29 @@ const notificationSchema = mongoose.Schema({
     blog: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: "blogs"
+        ref: "Blogs"
     },
     notificationFor:{
         type:Schema.Types.ObjectId,
         required: true,
-        ref: "users"
+        ref: "Users"
     },
     user: {
         type:Schema.Types.ObjectId,
         required:true,
-        ref:"users"
+        ref:"Users"
     },
     comment: {
         type: Schema.Types.ObjectId,
-        ref:"comments",
+        ref:"Comments",
     },
     reply: {
         type: Schema.Types.ObjectId,
-        ref:"comments"
+        ref:"Comments"
     },
     repliedOnComment: {
         type:Schema.Types.ObjectId,
-        ref:"comments"
+        ref:"Comments"
     },
     seen: {
         type:Boolean,
@@ -39,4 +39,4 @@ const notificationSchema = mongoose.Schema({
     }
 }, {timestamps: true});
 
-export default mongoose.model("notifications", notificationSchema);
+export default mongoose.model("Notifications", notificationSchema);

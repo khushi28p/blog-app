@@ -80,9 +80,9 @@ const userSchema = mongoose.Schema({
     },
     blogs: {
         type: [Schema.Types.ObjectId],
-        ref: 'blogs',
+        ref: 'Blogs',
         default: []
     }
 }, {timestamps: {createdAt: 'joinedAt'}});
 
-export default mongoose.model("users", userSchema);
+export default mongoose.model("Users", userSchema);
