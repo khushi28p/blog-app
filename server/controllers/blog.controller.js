@@ -31,7 +31,11 @@ export const publishBlog = async( req, res) => {
             draft: false,
         })
 
-        console.log(newBlogPost)
+        const userBlog = await Users.findByIdAndUpdate(
+            {_id: authorId},
+            {$push: {blogs: newBlogPost._id}},
+            {new: true}
+        )
 
         res.status(201).json({
             status: 'success',

@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js"
 import imageRouter from "./routes/image.routes.js";
 import blogRouter from "./routes/blog.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -21,7 +22,8 @@ const PORT = process.env.PORT;
 
 app.use("/api/auth", authRoutes);
 app.use('/api/upload-image', imageRouter);
-app.use("/api/blog", blogRouter)
+app.use("/api/blog", blogRouter);
+app.use('/api/user', userRouter)
 
 app.get("/", (req, res) => {
     res.send("Server running");

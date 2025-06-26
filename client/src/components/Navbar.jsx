@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { SquarePen, Bell, CircleUser, Search } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -106,7 +107,7 @@ const Navbar = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem><Link to={'/profile'}>Profile</Link></DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
