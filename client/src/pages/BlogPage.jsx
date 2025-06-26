@@ -63,7 +63,7 @@ const BlogPage = () => {
                 setLoading(true);
                 setError(null);
 
-                const response = await axios.get(`http://localhost:5000/api/blog/posts/${blogId}`);
+                const response = await axios.get(`http://localhost:5000/api/blog/${blogId}`);
                 setPost(response.data);
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to load blog post.');

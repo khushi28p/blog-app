@@ -12,11 +12,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchRandomTags = async () => {
+      const token = localStorage.getItem('userToken');
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       try {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:5000/api/blog/trending-tags"
+          "http://localhost:5000/api/blog/trending-tags", config 
         );
         setRandomTags(response.data);
       } catch (err) {

@@ -1,14 +1,15 @@
 import { Router } from "express";
-import { getAllPosts, getBlog, getTrendingPosts, getTrendingTags, publishBlog, saveDraft } from "../controllers/blog.controller.js";
+import { getAllBlogs,  getBlog, getTrendingBlogs,  getTrendingTags, likeBlog, publishBlog, saveDraft } from "../controllers/blog.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 const blogRouter = Router();
 
 blogRouter.post('/publish-blog', auth, publishBlog);
 blogRouter.post('/save-draft', auth, saveDraft);
-blogRouter.get('/posts', getAllPosts);
-blogRouter.get('/trending', getTrendingPosts);
-blogRouter.get('/trending-tags', getTrendingTags);
-blogRouter.get('/posts/:id', getBlog);
+blogRouter.get('/blogs', getAllBlogs);
+blogRouter.get('/trending', getTrendingBlogs);
+blogRouter.get('/trending-tags', auth, getTrendingTags);
+blogRouter.get('/:id', getBlog);
+blogRouter.get('/:id/like', likeBlog);
 
 export default blogRouter;

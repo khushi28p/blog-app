@@ -82,6 +82,11 @@ const userSchema = mongoose.Schema({
         type: [Schema.Types.ObjectId],
         ref: 'Blogs',
         default: []
+    },
+    liked_blogs: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Blogs',
+        default: []
     }
 }, {timestamps: {createdAt: 'joinedAt'}});
 

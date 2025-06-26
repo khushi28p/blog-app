@@ -30,7 +30,7 @@ const BlogPosts = () => {
                 const trendingResponse = await axios.get('http://localhost:5000/api/blog/trending');
                 setTrendingPosts(trendingResponse.data);
 
-                const response = await axios.get('http://localhost:5000/api/blog/posts');
+                const response = await axios.get('http://localhost:5000/api/blog/blogs');
 
                 const trendingIds = new Set(trendingResponse.data.map(post => post._id));
                 const filteredOtherPosts = response.data.filter(post => !trendingIds.has(post._id));

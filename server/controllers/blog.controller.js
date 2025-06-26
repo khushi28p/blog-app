@@ -98,7 +98,7 @@ export const saveDraft = async(req, res) => {
     }
 }
 
-export const getAllPosts = async (req, res) => {
+export const getAllBlogs = async (req, res) => {
     try {
         const allPosts = await Blogs.find({draft: false}).populate('author', '_id personal_info.username personal_info.email personal_info.profile_img').sort({createdAt: -1}); 
         const postsWithActivityCounts = allPosts.map(post => {
@@ -117,7 +117,7 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
-export const getTrendingPosts = async(req, res) => {
+export const getTrendingBlogs = async(req, res) => {
     try {
         const trendingPosts = await Blogs.aggregate([
             {$match: {draft: false}},
@@ -218,5 +218,33 @@ export const getBlog = async(req, res) => {
             return res.status(400).json({ message: 'Invalid blog ID' });
         }
         res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export const likeBlog = async(req, res) => {
+    const blogId = req.params.id;
+
+    try{
+        const updatedBlog = await Blogs.findByIdAndUpdate(
+            blogId,
+            {$inc: {'activity.total_likes': 1}},
+            {new: true, runValidators: true}
+        )
+
+        if(!updatedBlog){
+            return res.status(404).json({message: "Blog not found"});
+        }
+
+        res.status(200).json({
+            message: "Blog liked Successfully",
+            blog: updatedBlog
+        })
+    }
+    catch(error){
+        console.error('Error liking blog:', error);
+        res.status(500).json({
+            message: 'Server error while liking the blog.',
+            error: error.message
+        });
     }
 }
