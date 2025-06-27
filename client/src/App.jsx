@@ -9,7 +9,7 @@ import React from "react"
 import ProfilePage from "./pages/ProfilePage"
 import { Routes, Route } from "react-router-dom"
 import BlogPage from "./pages/BlogPage"
-import EditProfileModal from "./components/EditProfileModal"
+import EditProfileModal from "./components/EditProfileForm"
 
 function App() {
 

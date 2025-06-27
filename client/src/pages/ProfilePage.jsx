@@ -1,51 +1,49 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom"; 
-import { useSelector } from 'react-redux';
+import { Link, useNavigate } from "react-router-dom"; 
 import Navbar from '@/components/Navbar';
-import EditProfileModal from '@/components/EditProfileModal';
+import EditProfileForm from '@/components/EditProfileForm'; 
 import axios from 'axios';
+import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react'; 
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing  , setIsEditing] = useState(false); 
   const token = localStorage.getItem('userToken');
-  const config = {headers: {Authorization : `Bearer ${token}`}};
+  const config = { headers: { Authorization: `Bearer ${token}` } };
+  const navigate = useNavigate(); 
 
-  const handleProfileUpdateSuccess = () => {
-    fetchUserDetails(); 
-    setIsModalOpen(false); 
-  };
-  
-  const fetchUserDetails = async() => {
-        try {
-            const response = await axios.get('http://localhost:5000/api/user', config);
-            setUser(response.data); 
-        } catch (error) {
-            console.error("Error fetching user details:", error);
-        }
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/user', config);
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      if (error.response && error.response.status === 401) {
+        navigate('/login');
+      }
     }
+  };
 
   useEffect(() => {
     if (token) {
-        fetchUserDetails();
+      fetchUserDetails();
     } else {
-        console.log("No user token found. Redirecting or showing public profile.");
-        navigate('/login');
+      console.log("No user token found. Redirecting or showing public profile.");
+      navigate('/login');
     }
-  }, [token]); 
+  }, [token, navigate]);
 
-
-  const handleEditProfileClick = (e) => {
-    e.preventDefault();
-    setIsModalOpen(true);
+  const handleProfileUpdateSuccess = () => {
+    fetchUserDetails(); 
+    setIsEditing(false); 
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCancelEdit = () => {
+    setIsEditing(false); 
+    fetchUserDetails(); 
   };
 
   if (!user) {
@@ -58,19 +56,17 @@ const ProfilePage = () => {
 
   return (
     <div>
-      <Navbar/> 
+      <Navbar />
       <div className="container mx-auto py-8 px-4 md:px-20 min-h-screen bg-background">
-
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-grow md:w-2/3">
             <h1 className="text-3xl font-bold text-foreground mb-2">{user.personal_info?.username}</h1>
             {user.personal_info?.fullname && user.personal_info.fullname !== user.personal_info.username && (
-                <p className="text-lg text-muted-foreground mb-4">{user.personal_info.fullname}</p>
+              <p className="text-lg text-muted-foreground mb-4">{user.personal_info.fullname}</p>
             )}
             {user.personal_info?.bio && (
-                <p className="text-muted-foreground mb-6">{user.personal_info.bio}</p>
+              <p className="text-muted-foreground mb-6">{user.personal_info.bio}</p>
             )}
-
 
             <div className="flex space-x-6 text-lg border-b border-border mb-8">
               <span className="font-semibold text-foreground pb-2 border-b-2 border-primary">Home</span>
@@ -100,32 +96,77 @@ const ProfilePage = () => {
 
           <div className="md:w-1/3 flex justify-center md:justify-end">
             <Card className="w-full max-w-sm p-6 shadow-sm rounded-lg">
-              <div className="flex flex-col items-center">
-                <Avatar className="h-24 w-24 mb-4">
-                  <AvatarImage src={user.personal_info?.profile_img} alt="User Avatar" />
-                  <AvatarFallback className="text-4xl">{user.personal_info?.username ? user.personal_info.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
-                </Avatar>
-                <h2 className="text-xl font-bold text-foreground mb-2">{user.personal_info?.username}</h2>
-                <a
-                  href="#edit-profile"
-                  onClick={handleEditProfileClick}
-                  className="text-primary text-sm hover:underline mb-4 cursor-pointer"
-                >
-                  Edit profile
-                </a>
-              </div>
-              
+              {!isEditing ? (
+                <div className="flex flex-col items-center">
+                  <Avatar className="h-24 w-24 mb-4">
+                    <AvatarImage src={user.personal_info?.profile_img} alt="User Avatar" />
+                    <AvatarFallback className="text-4xl">{user.personal_info?.username ? user.personal_info.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-xl font-bold text-foreground mb-2">{user.personal_info?.fullname || user.personal_info?.username}</h2>
+                  <p className="text-sm text-muted-foreground mb-4">@{user.personal_info?.username}</p> 
+                  
+                  {user.personal_info?.bio && (
+                      <p className="text-muted-foreground text-center mb-4">{user.personal_info.bio}</p>
+                  )}
+
+                  <div className="flex flex-wrap justify-center gap-3 mb-4">
+                    {user.personal_info?.email && (
+                        <a href={`mailto:${user.personal_info.email}`} className="text-muted-foreground hover:text-primary">
+                            <Mail className="h-5 w-5" />
+                        </a>
+                    )}
+                    {user.social_links?.website && (
+                      <a href={user.social_links.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Globe className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.social_links?.youtube && (
+                      <a href={user.social_links.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Youtube className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.social_links?.instagram && (
+                      <a href={user.social_links.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Instagram className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.social_links?.facebook && (
+                      <a href={user.social_links.facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Facebook className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.social_links?.twitter && (
+                      <a href={user.social_links.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Twitter className="h-5 w-5" />
+                      </a>
+                    )}
+                     {user.social_links?.github && (
+                      <a href={user.social_links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                        <Github className="h-5 w-5" />
+                      </a>
+                    )}
+                  </div>
+
+
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    className="w-full mt-4"
+                    variant="outline"
+                  >
+                    Edit profile
+                  </Button>
+                </div>
+              ) : (
+                <EditProfileForm
+                  user={user} 
+                  onUpdateSuccess={handleProfileUpdateSuccess}
+                  onCancel={handleCancelEdit}
+                />
+              )}
             </Card>
           </div>
         </div>
       </div>
-
-      <EditProfileModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        user={user.personal_info} 
-        onUpdateSuccess={handleProfileUpdateSuccess}
-      />
     </div>
   );
 };

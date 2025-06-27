@@ -16,7 +16,7 @@ export const getUserDetails = async(req, res) => {
 
 export const updateUserDetails = async(req, res) => {
     const userId = req.user._id;
-    const {fullname, username, bio, profile_img} = req.body;
+    const {fullname, username, bio, profile_img, social_links} = req.body;
 
     try{
         const updateFields = {};
@@ -32,6 +32,26 @@ export const updateUserDetails = async(req, res) => {
         }
         if (profile_img !== undefined) {
             updateFields['personal_info.profile_img'] = profile_img;
+        }
+        if (social_links) {
+            if (social_links.youtube !== undefined) {
+                updateFields['social_links.youtube'] = social_links.youtube;
+            }
+            if (social_links.instagram !== undefined) {
+                updateFields['social_links.instagram'] = social_links.instagram;
+            }
+            if (social_links.facebook !== undefined) {
+                updateFields['social_links.facebook'] = social_links.facebook;
+            }
+            if (social_links.twitter !== undefined) {
+                updateFields['social_links.twitter'] = social_links.twitter;
+            }
+            if (social_links.github !== undefined) {
+                updateFields['social_links.github'] = social_links.github;
+            }
+            if (social_links.website !== undefined) {
+                updateFields['social_links.website'] = social_links.website;
+            }
         }
 
         const updatedUser = await Users.findByIdAndUpdate(
