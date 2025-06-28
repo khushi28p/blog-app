@@ -20,10 +20,8 @@ const SuggestionsSidebar = () => {
     const fetchTags = async () => {
       const token = localStorage.getItem('userToken');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      console.log(token)
       try {
         const response = await axios.get('http://localhost:5000/api/blog/trending-tags', config);
-        console.log(response.data);
         setTrendingTags(response.data);
       } catch (error) {
         console.error(error);

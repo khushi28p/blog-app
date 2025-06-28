@@ -84,3 +84,28 @@ export const updateUserDetails = async(req, res) => {
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
+
+export const getBlogs = async(req, res) => {
+    const userId = req.user._id;
+
+    try{
+        const user = await Users.findById(userId).select('blogs').populate({
+                                    path: 'blogs',
+                                    select: 'blog_id title content publishedAt', 
+                                    options: { sort: { publishedAt: -1 } } 
+                                });
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        const userBlogs = user.blogs;
+
+        res.status(200).json({ status: 'success', blogs: userBlogs });
+
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({message: "Internal server error"});
+    }
+}

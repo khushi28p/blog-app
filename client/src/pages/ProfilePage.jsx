@@ -2,18 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from '@/components/Navbar';
-import EditProfileForm from '@/components/EditProfileForm'; 
+import EditProfileForm from '@/components/EditProfileForm';
 import axios from 'axios';
-import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react'; 
+import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-  const [isEditing  , setIsEditing] = useState(false); 
+  const [blogs, setBlogs] = useState([]); 
+  const [isEditing, setIsEditing] = useState(false);
   const token = localStorage.getItem('userToken');
   const config = { headers: { Authorization: `Bearer ${token}` } };
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const fetchUserDetails = async () => {
     try {
@@ -27,6 +28,16 @@ const ProfilePage = () => {
     }
   };
 
+  const fetchUserBlogs = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/user/blogs`, config); 
+      setBlogs(response.data.blogs);
+    } catch (error) {
+      console.error("Error fetching user's blogs:", error);
+      setBlogs([]); 
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchUserDetails();
@@ -36,14 +47,20 @@ const ProfilePage = () => {
     }
   }, [token, navigate]);
 
+  useEffect(() => {
+    if (user) { 
+      fetchUserBlogs(); 
+    }
+  }, [user]); 
+
   const handleProfileUpdateSuccess = () => {
-    fetchUserDetails(); 
-    setIsEditing(false); 
+    fetchUserDetails();
+    setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false); 
-    fetchUserDetails(); 
+    setIsEditing(false);
+    fetchUserDetails();
   };
 
   if (!user) {
@@ -73,24 +90,38 @@ const ProfilePage = () => {
               <span className="text-muted-foreground hover:text-foreground cursor-pointer pb-2">About</span>
             </div>
 
-            <Card className="w-full shadow-sm rounded-lg">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">Reading list</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-4 p-4 rounded-md border border-dashed border-border text-muted-foreground">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.personal_info?.profile_img} alt="User Avatar" />
-                    <AvatarFallback>{user.personal_info?.username ? user.personal_info.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
-                  </Avatar>
-                  <span>No stories</span>
-                  <span className="ml-auto text-lg">...</span>
+            <div className="space-y-6"> 
+              {blogs.length > 0 ? (
+                blogs.map((blog) => (
+                  <Card key={blog._id} className="w-full shadow-sm rounded-lg flex flex-col md:flex-row gap-4 p-4">
+                    <div className="flex-grow">
+                      <Link to={`/blog/${blog.blog_id}`} className="block">
+                        <h3 className="text-xl font-bold text-foreground mb-2 hover:underline">
+                          {blog.title}
+                        </h3>
+                      </Link>
+                      <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
+                        {blog.content.content} 
+                      </p>
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <span>{new Date(blog.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                        
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 w-full md:w-48 h-32 md:h-24 bg-cover bg-center rounded-md overflow-hidden">
+                       <img 
+                           src={blog.coverImage} 
+                           alt={blog.title} 
+                           className="w-full h-full object-cover"
+                       />
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <div className="flex items-center justify-center p-8 rounded-md border border-dashed border-border text-muted-foreground text-center">
+                  <span>No stories published yet. Start writing!</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            <div className="mt-8 text-muted-foreground text-center">
-              <p>Your published stories will appear here.</p>
+              )}
             </div>
           </div>
 
@@ -103,17 +134,17 @@ const ProfilePage = () => {
                     <AvatarFallback className="text-4xl">{user.personal_info?.username ? user.personal_info.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
                   </Avatar>
                   <h2 className="text-xl font-bold text-foreground mb-2">{user.personal_info?.fullname || user.personal_info?.username}</h2>
-                  <p className="text-sm text-muted-foreground mb-4">@{user.personal_info?.username}</p> 
-                  
+                  <p className="text-sm text-muted-foreground mb-4">@{user.personal_info?.username}</p>
+
                   {user.personal_info?.bio && (
-                      <p className="text-muted-foreground text-center mb-4">{user.personal_info.bio}</p>
+                    <p className="text-muted-foreground text-center mb-4">{user.personal_info.bio}</p>
                   )}
 
                   <div className="flex flex-wrap justify-center gap-3 mb-4">
                     {user.personal_info?.email && (
-                        <a href={`mailto:${user.personal_info.email}`} className="text-muted-foreground hover:text-primary">
-                            <Mail className="h-5 w-5" />
-                        </a>
+                      <a href={`mailto:${user.personal_info.email}`} className="text-muted-foreground hover:text-primary">
+                        <Mail className="h-5 w-5" />
+                      </a>
                     )}
                     {user.social_links?.website && (
                       <a href={user.social_links.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
@@ -140,13 +171,12 @@ const ProfilePage = () => {
                         <Twitter className="h-5 w-5" />
                       </a>
                     )}
-                     {user.social_links?.github && (
+                    {user.social_links?.github && (
                       <a href={user.social_links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                         <Github className="h-5 w-5" />
                       </a>
                     )}
                   </div>
-
 
                   <Button
                     onClick={() => setIsEditing(true)}
@@ -158,7 +188,7 @@ const ProfilePage = () => {
                 </div>
               ) : (
                 <EditProfileForm
-                  user={user} 
+                  user={user}
                   onUpdateSuccess={handleProfileUpdateSuccess}
                   onCancel={handleCancelEdit}
                 />
