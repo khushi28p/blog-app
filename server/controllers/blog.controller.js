@@ -203,7 +203,7 @@ export const getTrendingTags = async(req, res) => {
 export const getBlog = async(req, res) => {
     try{
         const blogId = req.params.id;
-        const blog = await Blogs.findOne({blog_id: blogId}).populate('author', 'personal_info.username personal_info.profile_img');
+        const blog = await Blogs.findOne({blog_id: blogId}).populate('author', 'personal_info.username personal_info.profile_img').lean();
 
         if (!blog) {
             return res.status(404).json({ message: 'Blog post not found' });
@@ -215,6 +215,12 @@ export const getBlog = async(req, res) => {
             {new: true}
         )
 
+        if (req.user && blog.activity && blog.activity.likedBy) {
+            blog.isLikedByCurrentUser = blog.activity.likedBy.includes(req.user._id);
+        } else {
+            blog.isLikedByCurrentUser = false;
+        }
+
         res.json(blog);
     }catch (err) {
         console.error(err);
@@ -225,30 +231,82 @@ export const getBlog = async(req, res) => {
     }
 }
 
-export const likeBlog = async(req, res) => {
-    const blogId = req.params.id;
+export const likeBlog = async (req, res) => {
+    const blog_id = req.params.id;
+    const userId = req.user._id; // This should be a Mongoose ObjectId
 
-    try{
-        const updatedBlog = await Blogs.findByIdAndUpdate(
-            blogId,
-            {$inc: {'activity.total_likes': 1}},
-            {new: true, runValidators: true}
-        )
+    if (!userId) {
+        return res.status(401).json({ message: 'Authentication required to like a blog.' });
+    }
 
-        if(!updatedBlog){
-            return res.status(404).json({message: "Blog not found"});
+    try {
+        const blog = await Blogs.findOne({ blog_id: blog_id });
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog not found" });
         }
 
+        // Initialize activity and liked_by array if they don't exist or aren't arrays
+        // IMPORTANT: Changed 'likedBy' to 'liked_by' here to match schema
+        if (!blog.activity) {
+            blog.activity = {};
+        }
+        if (!Array.isArray(blog.activity.liked_by)) { // Corrected: liked_by
+            blog.activity.liked_by = []; // Corrected: liked_by
+        }
+
+        // Use .some() with .equals() for reliable ObjectId comparison
+        // IMPORTANT: Changed 'likedBy' to 'liked_by' here to match schema
+        const alreadyLiked = blog.activity.liked_by.some(likedId => // Corrected: liked_by
+            likedId.equals(userId)
+        );
+
+        let updateOperation;
+        let message;
+
+        if (alreadyLiked) {
+            updateOperation = {
+                $inc: { 'activity.total_likes': -1 },
+                $pull: { 'activity.liked_by': userId } // Corrected: liked_by (for MongoDB update)
+            };
+            message = "Blog unliked successfully";
+        } else {
+            updateOperation = {
+                $inc: { 'activity.total_likes': 1 },
+                $push: { 'activity.liked_by': userId } // Corrected: liked_by (for MongoDB update)
+            };
+            message = "Blog liked successfully";
+        }
+
+        const updatedBlog = await Blogs.findOneAndUpdate(
+            { blog_id: blog_id },
+            updateOperation,
+            { new: true, runValidators: true }
+        );
+
+        // Update user's liked_blogs array
+        await Users.findByIdAndUpdate(
+            userId, // userId is already the ObjectId
+            alreadyLiked ? { $pull: { liked_blogs: blog._id } } : { $push: { liked_blogs: blog._id } },
+            { new: true }
+        );
+
         res.status(200).json({
-            message: "Blog liked Successfully",
+            status: 'success',
+            message: message,   
             blog: updatedBlog
-        })
-    }
-    catch(error){
-        console.error('Error liking blog:', error);
+        });
+
+    } catch (error) {
+        console.error('Error toggling like status:', error);
+        // Added specific error handling for CastError on _id, which might happen
+        // if req.user._id isn't a valid ObjectId format
+        if (error.name === 'CastError' && error.path === '_id') {
+            return res.status(400).json({ message: 'Invalid User ID format.' });
+        }
         res.status(500).json({
-            message: 'Server error while liking the blog.',
+            message: 'Server error while toggling like status.',
             error: error.message
         });
     }
-}
+};

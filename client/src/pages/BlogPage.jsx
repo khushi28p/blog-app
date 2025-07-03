@@ -20,11 +20,12 @@ import TableCell from '@tiptap/extension-table-cell';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Navbar from '@/components/Navbar';
+import { useSelector } from 'react-redux';
 
 const displayExtensions = [
     StarterKit,
     Image.configure({ inline: true, allowBase64: true }),
-    Placeholder.configure({ 
+    Placeholder.configure({
         placeholder: ({ node }) => {
             if (node.type.name === 'heading') return 'What’s the title?';
             return 'Write something amazing…';
@@ -36,7 +37,7 @@ const displayExtensions = [
         types: ['heading', 'paragraph'],
     }),
     Link.configure({
-        openOnClick: false, 
+        openOnClick: false,
         autolink: true,
         defaultProtocol: 'https',
     }),
@@ -56,36 +57,67 @@ const BlogPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [renderedHtml, setRenderedHtml] = useState('');
+    const [isLiked, setIsLiked] = useState(false); 
+
+    const userToken = useSelector((state) => state.auth.token);
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+    const fetchPost = async () => {
+        if (!blogId) {
+            console.error("Blog ID is missing from URL parameters.");
+            setError("Cannot load blog: Invalid URL.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            console.log("Frontend: Attempting to fetch blog with ID:", blogId);
+
+            const response = await axios.get(`http://localhost:5000/api/blog/${blogId}`, {
+                headers: {
+                    ...(userToken && { Authorization: `Bearer ${userToken}` })
+                }
+            });
+            setPost(response.data);
+
+            console.log("Fetched blog data:", response.data); 
+
+            if (response.data && response.data.activity && typeof response.data.isLikedByCurrentUser === 'boolean') {
+                setIsLiked(response.data.isLikedByCurrentUser);
+            } else {
+                setIsLiked(false);
+                console.warn("Backend did not provide 'isLikedByCurrentUser' status within activity object for the blog.");
+            }
+
+        } catch (err) {
+            console.error("Frontend: Error fetching blog post:", err);
+            setError(err.response?.data?.message || 'Failed to load blog post.');
+            toast.error(err.response?.data?.message || 'Failed to load blog post.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchPost = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-
-                const response = await axios.get(`http://localhost:5000/api/blog/${blogId}`);
-                setPost(response.data);
-            } catch (err) {
-                setError(err.response?.data?.message || 'Failed to load blog post.');
-                toast.error(err.response?.data?.message || 'Failed to load blog post.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (blogId) {
-            fetchPost();
-        }
-    }, [blogId]);
+        fetchPost();
+    }, [blogId, isLoggedIn, userToken]); 
 
     useEffect(() => {
         if (post?.content) {
             let tiptapJson = null;
 
             if (Array.isArray(post.content) && post.content.length > 0) {
-                tiptapJson = post.content[0];
+                if (typeof post.content[0] === 'object' && post.content[0] !== null && post.content[0].type === 'doc') {
+                     tiptapJson = post.content[0];
+                } else {
+                    console.warn("Blog content is an array but its first element is not a Tiptap 'doc' object.");
+                    tiptapJson = null;
+                }
             } else if (typeof post.content === 'object' && post.content !== null && post.content.type === 'doc') {
-                tiptapJson = post.content; 
+                tiptapJson = post.content;
             }
 
             if (tiptapJson) {
@@ -93,13 +125,45 @@ const BlogPage = () => {
                     const html = generateHTML(tiptapJson, displayExtensions);
                     setRenderedHtml(html);
                 } catch (htmlError) {
+                    console.error("Error generating HTML:", htmlError);
                     setRenderedHtml('<p>Error rendering content.</p>');
                 }
             } else {
                 setRenderedHtml('<p>No content to display.</p>');
             }
         }
-    }, [post]); 
+    }, [post]);
+
+    const handleLike = async () => {
+        if (!isLoggedIn || !userToken) {
+            toast.info("Please log in to like a blog.");
+            return;
+        }
+
+        if (!blogId) {
+            toast.error("Cannot like: Blog ID is missing from URL.");
+            return;
+        }
+
+        console.log("Like Request sent to the backend");
+
+        try {
+            await axios.post(
+                `http://localhost:5000/api/blog/${blogId}/like`,
+                {}, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`
+                    }
+                }
+            );
+            await fetchPost(); 
+        } catch (err) {
+            console.error('Error toggling like:', err.response?.data || err.message);
+            setError(err.response?.data?.message || 'Failed to update like status.');
+            toast.error(err.response?.data?.message || 'Failed to update like status.');
+        }
+    };
 
     if (loading) {
         return (
@@ -127,71 +191,81 @@ const BlogPage = () => {
 
     return (
         <div>
-        <Navbar/>
-        <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 bg-white shadow-lg rounded-lg my-8">
-            {post.banner && (
-                <img
-                    src={post.banner}
-                    alt={post.title}
-                    className="w-full h-80 object-cover rounded-lg mb-8 shadow-md"
-                />
-            )}
+            <Navbar/>
+            <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 bg-white shadow-lg rounded-lg my-8">
+                {post.banner && (
+                    <img
+                        src={post.banner}
+                        alt={post.title}
+                        className="w-full h-80 object-cover rounded-lg mb-8 shadow-md"
+                    />
+                )}
 
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-4 leading-tight font-serif">
-                {post.title}
-            </h1>
+                <h1 className="text-4xl font-extrabold text-gray-900 mb-4 leading-tight font-serif">
+                    {post.title}
+                </h1>
 
-            {post.author && (
-                <div className="flex items-center gap-4 mb-6 text-gray-700">
-                    {post.author.personal_info?.profile_img ? (
-                        <img
-                            src={post.author.personal_info.profile_img}
-                            alt={post.author.personal_info?.username || 'Author'}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-gray-300 p-px"
-                        />
-                    ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl font-bold border-2 border-gray-300">
-                            {post.author.personal_info?.username ? post.author.personal_info.username.charAt(0).toUpperCase() : 'A'}
+                {post.author && (
+                    <div className="flex items-center gap-4 mb-6 text-gray-700">
+                        {post.author.personal_info?.profile_img ? (
+                            <img
+                                src={post.author.personal_info.profile_img}
+                                alt={post.author.personal_info?.username || 'Author'}
+                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-300 p-px"
+                            />
+                        ) : (
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl font-bold border-2 border-300">
+                                {post.author.personal_info?.username ? post.author.personal_info.username.charAt(0).toUpperCase() : 'A'}
+                            </div>
+                        )}
+                        <div>
+                            <p className="font-semibold text-lg">{post.author.personal_info?.username || 'Unknown Author'}</p>
+                            <p className="text-sm text-gray-500">
+                                {post.publishedAt && `Published on ${format(new Date(post.publishedAt), 'MMM dd,yyyy')}`}
+                            </p>
                         </div>
-                    )}
-                    <div>
-                        <p className="font-semibold text-lg">{post.author.personal_info?.username || 'Unknown Author'}</p>
-                        <p className="text-sm text-gray-500">
-                            {post.publishedAt && `Published on ${format(new Date(post.publishedAt), 'MMM dd,yyyy')}`}
-                        </p>
+                    </div>
+                )}
+
+                {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {post.tags.map((tag, i) => (
+                            <span key={i} className="px-4 py-1 bg-blue-50 text-blue-700 text-sm rounded-full font-semibold border border-blue-100">
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
+                <div
+                    className="prose prose-lg max-w-none text-gray-800 leading-relaxed font-sans mb-8 focus:outline-none"
+                    dangerouslySetInnerHTML={{ __html: renderedHtml }}
+                />
+
+                <div className="flex items-center gap-6 text-gray-600 border-t pt-6 mt-6">
+                    <button
+                        onClick={handleLike}
+                        disabled={!isLoggedIn} 
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-200
+                                ${isLiked
+                                    ? 'bg-green-100 text-green-700'
+                                    : (isLoggedIn ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-gray-100 text-gray-400 cursor-not-allowed')
+                                }`}
+                    >
+                        <ThumbsUp
+                            className={`w-5 h-5 ${isLiked ? 'fill-green-500 text-green-500' : 'fill-none text-gray-500'}`}
+                        />
+                        <span className="font-medium">{post.activity.total_likes || 0} Likes</span>
+                    </button>
+                    <div className="flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-blue-500" />
+                        <span className="font-medium">{post.activity.total_comments || 0} Comments</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="font-medium">{post.activity.total_reads || 0} reads</span>
                     </div>
                 </div>
-            )}
-
-            {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                    {post.tags.map((tag, i) => (
-                        <span key={i} className="px-4 py-1 bg-blue-50 text-blue-700 text-sm rounded-full font-semibold border border-blue-100">
-                            #{tag}
-                        </span>
-                    ))}
-                </div>
-            )}
-
-            <div
-                className="prose prose-lg max-w-none text-gray-800 leading-relaxed font-sans mb-8 focus:outline-none"
-                dangerouslySetInnerHTML={{ __html: renderedHtml }}
-            />
-
-            <div className="flex items-center gap-6 text-gray-600 border-t pt-6 mt-6">
-                <div className="flex items-center gap-2">
-                    <ThumbsUp className="w-5 h-5 text-green-500" />
-                    <span className="font-medium">{post.activity.total_likes || 0} Likes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-blue-500" />
-                    <span className="font-medium">{post.activity.total_comments || 0} Comments</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="font-medium">{post.activity.total_reads || 0} reads</span>
-                </div>
             </div>
-        </div>
         </div>
     );
 };

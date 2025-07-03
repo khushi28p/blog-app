@@ -10,6 +10,6 @@ blogRouter.get('/blogs', getAllBlogs);
 blogRouter.get('/trending', getTrendingBlogs);
 blogRouter.get('/trending-tags', auth, getTrendingTags);
 blogRouter.get('/:id', getBlog);
-blogRouter.get('/:id/like', likeBlog);
+blogRouter.post('/:id/like', auth, likeBlog);
 
 export default blogRouter;
