@@ -71,7 +71,21 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-card to-background text-foreground">
+    <div className="flex relative min-h-screen items-center justify-center bg-gradient-to-br from-background via-card to-background text-foreground">
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-800 to-blue-900 opacity-90">
+        {/* Optional: Add a subtle pattern or texture to the background */}
+        <div className="absolute inset-0 bg-[url('https://placehold.co/100x100/000000/FFFFFF/png?text=')] opacity-10" style={{ backgroundSize: '20px 20px', backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)' }}></div>
+
+        <div className="absolute inset-0">
+          <div className="absolute w-28 h-28 bg-white/35 rounded-lg left-1/5 transform translate-x-1/2 translate-y-1/2"></div>
+          <div className="absolute w-48 h-48 bg-gray-900/35 rounded-xl top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute w-64 h-64 bg-black/50 rounded-xl bottom-1/3 right-1/4 transform translate-x-1/2 translate-y-1/2"></div>
+          <div className="absolute w-48 h-32 bg-gray-400/50 rounded-lg top-1/2 left-3/4 transform -translate-x -translate-y-1/2"></div>
+          <div className="absolute w-40 h-20 bg-white/10 rounded top-1/5 right-1/5 transform -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex min-h-screen items-center justify-center w-full">
       <Card className="w-[380px] bg-card p-6 shadow-lg rounded-xl">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-extrabold text-primary">Join QuillJot</CardTitle>
@@ -168,6 +182,7 @@ const SignupPage = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

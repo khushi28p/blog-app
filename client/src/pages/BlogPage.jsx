@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ThumbsUp, MessageSquare } from 'lucide-react';
 import { BACKEND_URL } from '@/config';
+import CommentSection from '@/components/CommentSection';
 
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
@@ -267,6 +268,7 @@ const BlogPage = () => {
                     </div>
                 </div>
             </div>
+            {blogId && <CommentSection blogId={post._id}/>} 
         </div>
     );
 };

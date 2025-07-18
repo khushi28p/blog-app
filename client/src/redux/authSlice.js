@@ -102,20 +102,20 @@ const authSlice = createSlice({
             state.error = null;
         })
         .addCase(signupUser.fulfilled, (state, action) => {
-            // state.user = action.payload.user;
-            // state.token = action.payload.token;
-            // state.isLoggedIn = true;
+            state.user = action.payload.user;
+            state.token = action.payload.token;
+            state.isLoggedIn = true;
             state.loading = false;
             state.error = null;
-            // localStorage.setItem('userToken', action.payload.token);
-            // localStorage.setItem('user', JSON.stringify(action.payload.user));
+                localStorage.setItem('userToken', action.payload.token);
+                localStorage.setItem('user', JSON.stringify(action.payload.user));
         })
         .addCase(signupUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload || "Login failed";
-            // state.isLoggedIn = false;
-            // state.user = null;
-            // state.token = null;
+            state.isLoggedIn = false;
+            state.user = null;
+            state.token = null;
         })
     }
 })

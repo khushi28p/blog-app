@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js"
 import imageRouter from "./routes/image.routes.js";
 import blogRouter from "./routes/blog.routes.js";
 import userRouter from "./routes/user.routes.js";
+import commentRouter from "./routes/comment.routes.js";
 
 dotenv.config();
 
@@ -22,11 +23,12 @@ app.use(cors({
 }));
 
 const PORT = process.env.PORT;
-
+  
 app.use("/api/auth", authRoutes);
 app.use('/api/upload-image', imageRouter);
 app.use("/api/blog", blogRouter);
-app.use('/api/user', userRouter)
+app.use('/api/user', userRouter);
+app.use('/api/comments', commentRouter);
 
 app.get("/", (req, res) => {
     res.send("Server running");
