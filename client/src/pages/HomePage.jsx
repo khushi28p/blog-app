@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import Navbar from '@/components/Navbar'; 
 import { useSelector } from 'react-redux';
 import Dashboard from './Dashboard';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const {isLoggedIn} = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-card to-background text-foreground font-inter">
       
@@ -32,10 +35,14 @@ const HomePage = () => {
             QuillJot is your effortless platform for creating, sharing, and connecting through compelling blogs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-end">
-            <Button size="lg" className="px-8 py-3 text-lg font-semibold shadow-md hover:shadow-lg transition-shadow duration-300">
+            <Button size="lg" onClick={() => {
+              isLoggedIn ? navigate("/editor") : navigate("/login");
+            }} className="px-8 py-3 text-lg font-semibold shadow-md hover:shadow-lg transition-shadow duration-300">
               Start Writing Now
             </Button>
-            <Button variant="outline" size="lg" className="px-8 py-3 text-lg font-semibold border-2 border-primary hover:bg-primary/10 transition-colors duration-300">
+            <Button variant="outline" size="lg" onClick={() => {
+              isLoggedIn ? navigate("/") : navigate("/login");
+            }} className="px-8 py-3 text-lg font-semibold border-2 border-primary hover:bg-primary/10 transition-colors duration-300">
               Explore Blogs
             </Button>
           </div>
@@ -86,7 +93,7 @@ const HomePage = () => {
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
             Join the QuillJot community today and begin sharing your unique perspective with the world.
           </p>
-          <Button size="lg" className="px-10 py-4 text-xl font-semibold shadow-xl hover:shadow-2xl transition-shadow duration-300">
+          <Button size="lg" onClick={() => navigate('/signup')} className="px-10 py-4 text-xl font-semibold shadow-xl hover:shadow-2xl transition-shadow duration-300">
             Sign Up for Free
           </Button>
         </div>

@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { SquarePen, Bell, CircleUser, Search } from "lucide-react";
 import { useSelector } from "react-redux";
 import { logout } from "../redux/authSlice.js";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ const Navbar = () => {
   const handleLogout = () => {
     try{
     dispatch(logout());
-    navigate("/login");
+    navigate("/");
+    toast("Logged out successfully");
     } catch(error){
       console.error("Logout failed:", error);
     }
@@ -117,7 +119,9 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center space-x-6"> 
             <a href="/about-us" className="text-foreground text-sm font-medium hidden md:inline-block">About Us</a>
-                          <a href="/write" className="text-foreground text-sm font-medium hidden md:inline-block">Write</a>
+                          <a onClick={() => {
+              isLoggedIn ? navigate("/editor") : navigate("/login");
+            }} className="text-foreground text-sm font-medium hidden md:inline-block">Write</a>
               <a href="/membership" className="text-foreground text-sm font-medium hidden md:inline-block">Membership</a>
 
               <Button onClick={() => navigate("/login")} variant="ghost" className="hidden sm:inline-flex font-semibold">
