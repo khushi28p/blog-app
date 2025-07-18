@@ -11,6 +11,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { BACKEND_URL } from '@/config';
 
 import { ThumbsUp, MessageSquare, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
@@ -27,10 +28,10 @@ const BlogPosts = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const trendingResponse = await axios.get('http://localhost:5000/api/blog/trending');
+                const trendingResponse = await axios.get(`${BACKEND_URL}/api/blog/trending`);
                 setTrendingPosts(trendingResponse.data);
 
-                const response = await axios.get('http://localhost:5000/api/blog/blogs');
+                const response = await axios.get(`${BACKEND_URL}/api/blog/blogs`);
 
                 const trendingIds = new Set(trendingResponse.data.map(post => post._id));
                 const filteredOtherPosts = response.data.filter(post => !trendingIds.has(post._id));

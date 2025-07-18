@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
+import { BACKEND_URL } from "@/config.js";  
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -107,7 +108,7 @@ const BlogEditor = () => {
                 const token = localStorage.getItem('userToken');
                 const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
-                const response = await axios.post('http://localhost:5000/api/upload-image', formData, config);
+                const response = await axios.post(`${BACKEND_URL}/api/upload-image`, formData, config);
                 const url = response.data.url;
                 setBannerImageUrl(url);
                 toast.success("Banner image uploaded successfully!");
@@ -174,7 +175,7 @@ const BlogEditor = () => {
                 dataToSave.blog_id = currentDraftId;
             }
 
-            const response = await axios.post("http://localhost:5000/api/blog/save-draft", dataToSave, config);
+            const response = await axios.post(`${BACKEND_URL}/api/blog/save-draft`, dataToSave, config);
 
             toast.dismiss('save-draft');
             toast.success(response.data.message || "Draft saved!");

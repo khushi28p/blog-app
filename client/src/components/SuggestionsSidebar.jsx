@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import axios from 'axios';
+import { BACKEND_URL } from '@/config'; 
 
 const SuggestionsSidebar = () => {
   const [trendingTags, setTrendingTags] = useState([]);
@@ -21,7 +22,7 @@ const SuggestionsSidebar = () => {
       const token = localStorage.getItem('userToken');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       try {
-        const response = await axios.get('http://localhost:5000/api/blog/trending-tags', config);
+        const response = await axios.get(`${BACKEND_URL}/api/blog/trending-tags`, config);
         setTrendingTags(response.data);
       } catch (error) {
         console.error(error);

@@ -38,6 +38,7 @@ import {
   LuHeading2,
   LuHeading3,
 } from "react-icons/lu";
+import { BACKEND_URL } from "@/config";
 
 const EditorMenuBar = ({ editor}) => {
   if (!editor) {
@@ -55,7 +56,7 @@ const EditorMenuBar = ({ editor}) => {
         formData.append('image', file);
 
         try{
-            const response = await axios.post('http://localhost:5000/api/upload-image', formData, {
+            const response = await axios.post(`${BACKEND_URL}/api/upload-image`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`

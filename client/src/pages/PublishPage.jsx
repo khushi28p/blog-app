@@ -1,11 +1,9 @@
-// src/pages/PublishPage.jsx - No changes needed based on your description.
-// (Content remains as provided previously)
-
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { BACKEND_URL } from '@/config';
 
 import {
     updatePublishTags,
@@ -84,7 +82,7 @@ const PublishPage = () => {
             const config = getAuthHeaders();
             if (!config.headers) return;
 
-            const response = await axios.post("http://localhost:5000/api/blog/publish-blog", {
+            const response = await axios.post(`${BACKEND_URL}/api/blog/publish-blog`, {
                 title: title,
                 banner: bannerImageUrl,
                 des: localDescription,

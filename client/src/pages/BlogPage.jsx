@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ThumbsUp, MessageSquare } from 'lucide-react';
+import { BACKEND_URL } from '@/config';
 
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
@@ -76,7 +77,7 @@ const BlogPage = () => {
 
             console.log("Frontend: Attempting to fetch blog with ID:", blogId);
 
-            const response = await axios.get(`http://localhost:5000/api/blog/${blogId}`, {
+            const response = await axios.get(`${BACKEND_URL}/api/blog/${blogId}`, {
                 headers: {
                     ...(userToken && { Authorization: `Bearer ${userToken}` })
                 }
@@ -149,7 +150,7 @@ const BlogPage = () => {
 
         try {
             await axios.post(
-                `http://localhost:5000/api/blog/${blogId}/like`,
+                `${BACKEND_URL}/api/blog/${blogId}/like`,
                 {}, 
                 {
                     headers: {

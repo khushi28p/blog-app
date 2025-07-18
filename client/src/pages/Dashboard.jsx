@@ -4,6 +4,7 @@ import SuggestionsSidebar from "@/components/SuggestionsSidebar";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { toast } from "sonner";
+import { BACKEND_URL } from "@/config"; 
 
 const Dashboard = () => {
   const [randomTags, setRandomTags] = useState([]);
@@ -18,7 +19,7 @@ const Dashboard = () => {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:5000/api/blog/trending-tags", config 
+          `${BACKEND_URL}/api/blog/trending-tags`, config 
         );
         setRandomTags(response.data);
       } catch (err) {

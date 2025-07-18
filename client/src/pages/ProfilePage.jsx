@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import EditProfileForm from '@/components/EditProfileForm';
 import axios from 'axios';
 import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react';
+import { BACKEND_URL } from '@/config';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -18,7 +19,7 @@ const ProfilePage = () => {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/user', config);
+      const response = await axios.get(`${BACKEND_URL}/api/user`, config);
       setUser(response.data);
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -30,7 +31,7 @@ const ProfilePage = () => {
 
   const fetchUserBlogs = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user/blogs`, config); 
+      const response = await axios.get(`${BACKEND_URL}/api/user/blogs`, config); 
       setBlogs(response.data.blogs);
     } catch (error) {
       console.error("Error fetching user's blogs:", error);

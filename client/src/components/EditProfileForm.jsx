@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import axios from 'axios';
+import { BACKEND_URL } from '@/config'; 
 
 const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
   const [username, setUsername] = useState(user?.personal_info?.username || '');
@@ -71,7 +72,7 @@ const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
     };
 
     try {
-        const response = await axios.put('http://localhost:5000/api/user/update-user', {
+        const response = await axios.put(`${BACKEND_URL}/api/user/update-user`, {
             personal_info: {
               username: updateData.username,
                 fullname: updateData.fullname,
