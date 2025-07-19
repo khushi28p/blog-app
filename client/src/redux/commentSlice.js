@@ -96,7 +96,7 @@ const findAndUpdateComment = (comments, updatedComment) => {
         if(comment.children && comment.children.length > 0){
             return {
                 ...comment,
-                children: findAndUpdateComment(comment.children , updateComment)
+                children: findAndUpdateComment(comment.children , updatedComment)
             }
         }
 
