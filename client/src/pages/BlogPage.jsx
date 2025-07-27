@@ -267,8 +267,9 @@ const BlogPage = () => {
                         <span className="font-medium">{post.activity.total_reads || 0} reads</span>
                     </div>
                 </div>
+                {blogId && <CommentSection blogId={post._id}/>} 
             </div>
-            {blogId && <CommentSection blogId={post._id}/>} 
+            
         </div>
     );
 };
