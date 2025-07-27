@@ -97,7 +97,6 @@ export const getCommentByBlog = async (req, res) => {
       })
       .sort({ commentedAt: 1 });
 
-    console.log("Backend response for GET comments:", JSON.stringify(comments, null, 2));
     res.status(200).json(comments);
   } catch (error) {
     console.error("Error fetching comments:", error);

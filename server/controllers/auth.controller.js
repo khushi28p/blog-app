@@ -2,16 +2,19 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const login = async(req, res) => {
-  const {email, password} = req.body.personal_info;
+export const login = async (req, res) => {
+  const { email, password } = req.body.personal_info;
 
   try {
-    const user = await User.findOne({"personal_info.email": email});
+    const user = await User.findOne({ "personal_info.email": email });
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.personal_info.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.personal_info.password
+    );
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password." });
     }
@@ -25,6 +28,7 @@ export const login = async(req, res) => {
     res.status(200).json({
       message: "Login successful.",
       user: {
+        _id: user._id,
         fullname: user.personal_info.fullname,
         email: user.personal_info.email,
         username: user.personal_info.username,
@@ -38,18 +42,20 @@ export const login = async(req, res) => {
 };
 
 const generateUsername = (email) => {
-  const emailPrefix = email.split('@')[0];
+  const emailPrefix = email.split("@")[0];
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
   return `${emailPrefix}${randomNumber}`;
 };
 
 export const signup = async (req, res) => {
-  const {fullname, email, password} = req.body.personal_info;
+  const { fullname, email, password } = req.body.personal_info;
 
-  try{
+  try {
     const existingUser = await User.findOne({ "personal_info.email": email });
-    if(existingUser){
-      return res.status(400).json({message: "User with this email already exists."});
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -68,9 +74,8 @@ export const signup = async (req, res) => {
       message: "User created successfully.",
       user: newUser.personal_info,
     });
-  }
-  catch(error){
+  } catch (error) {
     console.error("Error during signup:", error);
-    res.status(500).json({message: "Internal server error."});
+    res.status(500).json({ message: "Internal server error." });
   }
 };
