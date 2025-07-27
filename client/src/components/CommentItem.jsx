@@ -36,6 +36,7 @@ const CommentItem = ({ comment, blogId }) => {
       )
     ) {
       dispatch(deleteComment(comment._id));
+      toast.success("Comment deleted successfully!"); 
     }
   };
 
@@ -46,14 +47,19 @@ const CommentItem = ({ comment, blogId }) => {
       editor.getHTML().trim() === "<p></p>" ||
       editor.getHTML().trim() === ""
     ) {
-      alert("Comment cannot be empty.");
+      toast.error("Comment cannot be empty.");
       return;
     }
 
-    await dispatch(
+    const resultAction = await dispatch(
       updateComment({ commentId: comment._id, comment: editor.getHTML() })
     );
-    setIsEditing(false);
+    if (updateComment.fulfilled.match(resultAction)) {
+      setIsEditing(false);
+      toast.success("Comment updated successfully!");
+    } else {
+        toast.error(resultAction.payload?.message || "Failed to update comment.");
+    }
   };
 
   if (!editor) {
