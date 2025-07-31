@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/config"; 
+import Navbar from "@/components/Navbar";
 
 const Dashboard = () => {
   const [randomTags, setRandomTags] = useState([]);
@@ -34,10 +35,11 @@ const Dashboard = () => {
   }, []);
 
   return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-card to-background text-foreground font-inter">
+      <Navbar />
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col lg:flex-row lg:gap-8">
-        {/* Main Content Area (Blog Posts) */}
-        <div className="lg:w-3/4">
+          <div className="lg:w-3/4">
           <div className="mb-6 text-center">
             {loading ? (
               <p className="text-lg text-gray-500">Loading popular topics...</p>
@@ -70,12 +72,12 @@ const Dashboard = () => {
           <BlogPosts />
         </div>
 
-        {/* Sidebar Area (Recommendations/Suggestions) */}
         <div className="lg:w-1/4 mt-8 lg:mt-0">
           <SuggestionsSidebar />
         </div>
       </div>
     </div>
+    </div>  
   );
 };
 

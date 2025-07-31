@@ -310,6 +310,7 @@ const BlogPage = () => {
         </div>
         {blogId && <CommentSection blogId={post._id} />}
       </div>
+      
     </div>
   );
 };
