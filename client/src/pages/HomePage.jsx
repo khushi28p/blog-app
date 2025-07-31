@@ -1,12 +1,10 @@
 import React from 'react';
 import { Button } from "@/components/ui/button"; 
 import Navbar from '@/components/Navbar'; 
-import { useSelector } from 'react-redux'; 
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Compass, Lightbulb, MessageSquare, CloudUpload, Bold, Italic, Underline, Strikethrough, List, Code, Type } from 'lucide-react'; 
 
 const HomePage = () => {
-  const { isLoggedIn } = useSelector((state) => state.auth); 
   const navigate = useNavigate();
 
   return (
@@ -52,7 +50,7 @@ const HomePage = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate("/blogs")}
+                onClick={() => navigate("/login")}
                 className="px-8 py-3 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary/10 transition-colors duration-300 flex items-center gap-2"
               >
                 <Compass className="w-5 h-5"/>
