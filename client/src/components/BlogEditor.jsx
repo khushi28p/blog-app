@@ -1,7 +1,6 @@
 import React, { useState, useRef} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/config.js";  
 

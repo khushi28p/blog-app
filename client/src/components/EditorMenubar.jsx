@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import axiosInstance from "@/api/axios";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -56,10 +56,9 @@ const EditorMenuBar = ({ editor}) => {
         formData.append('image', file);
 
         try{
-            const response = await axios.post(`${BACKEND_URL}/api/upload-image`, formData, {
+            const response = await axiosInstance.post('/upload-image', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
                 }
             });
 

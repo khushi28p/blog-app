@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { BACKEND_URL } from "@/config";
+import axiosInstance from "@/api/axios";
 
 const initialState = {
   user: null,
@@ -14,7 +13,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+      const response = await axiosInstance.post('/auth/login', {
         personal_info: credentials,
       });
       return response.data;
@@ -28,7 +27,7 @@ export const signupUser = createAsyncThunk(
   "auth/signupUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/auth/signup`, {
+      const response = await axios.post('/auth/signup', {
         personal_info: credentials,
       });
       return response.data;
@@ -48,6 +47,9 @@ const authSlice = createSlice({
       state.isLoggedIn = true;
       state.loading = false;
       state.error = null;
+
+      localStorage.setItem('userToken', action.payload.token);
+            localStorage.setItem('user', JSON.stringify(action.payload.user));
     },
     logout: (state) => {
       state.user = null;
@@ -55,6 +57,9 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.loading = false;
       state.error = null;
+
+      localStorage.removeItem('userToken');
+            localStorage.removeItem('user');
     },
   },
   extraReducers: (builder) => {
@@ -69,6 +74,9 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.loading = false;
         state.error = null;
+
+        localStorage.setItem('userToken', action.payload.token);
+            localStorage.setItem('user', JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -76,6 +84,9 @@ const authSlice = createSlice({
         state.isLoggedIn = false;
         state.user = null;
         state.token = null;
+
+        localStorage.removeItem('userToken');
+            localStorage.removeItem('user');
       })
       .addCase(signupUser.pending, (state) => {
         state.loading = true;

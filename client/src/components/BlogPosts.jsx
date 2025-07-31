@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axiosInstance from '@/api/axios';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
@@ -28,10 +28,10 @@ const BlogPosts = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const trendingResponse = await axios.get(`${BACKEND_URL}/api/blog/trending`);
+                const trendingResponse = await axiosInstance.get('/blog/trending');
                 setTrendingPosts(trendingResponse.data);
 
-                const response = await axios.get(`${BACKEND_URL}/api/blog/blogs`);
+                const response = await axiosInstance.get('/blog/blogs');
 
                 const trendingIds = new Set(trendingResponse.data.map(post => post._id));
                 const filteredOtherPosts = response.data.filter(post => !trendingIds.has(post._id));

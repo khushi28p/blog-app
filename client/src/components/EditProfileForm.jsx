@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import axios from "axios";
+import axiosInstance from "@/api/axios";
 import { BACKEND_URL } from "@/config";
 
 import { useSelector } from "react-redux";
@@ -82,8 +82,8 @@ const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
     };
 
     try {
-      const response = await axios.put(
-        `${BACKEND_URL}/api/user/update-user`,
+      const response = await axiosInstance.put(
+        '/user/update-user',
         {
           personal_info: {
             username: updateData.username,
@@ -92,8 +92,7 @@ const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
             profile_img: updateData.profile_img,
           },
           social_links: updateData.social_links,
-        },
-        config
+        }
       );
 
       if (response.data.status === "success") {

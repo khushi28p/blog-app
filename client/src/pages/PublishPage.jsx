@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import axios from 'axios';
+import axiosInstance from '@/api/axios';
 import { BACKEND_URL } from '@/config';
 
 import {
@@ -82,13 +82,13 @@ const PublishPage = () => {
             const config = getAuthHeaders();
             if (!config.headers) return;
 
-            const response = await axios.post(`${BACKEND_URL}/api/blog/publish-blog`, {
+            const response = await axiosInstance.post('/blog/publish-blog', {
                 title: title,
                 banner: bannerImageUrl,
                 des: localDescription,
                 content: jsonContent,
                 tags: processedTags,
-            }, config);
+            });
 
             toast.dismiss('final-publish');
             toast.success(response.data.message || "Blog published successfully!");
@@ -101,7 +101,6 @@ const PublishPage = () => {
             console.error("Error publishing blog:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to publish blog.");
             if (error.response?.status === 401) {
-                localStorage.removeItem('userToken');
                 navigate("/login");
             }
         }

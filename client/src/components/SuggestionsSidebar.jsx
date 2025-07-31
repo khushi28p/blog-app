@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import axios from 'axios';
+import axiosInstance from '@/api/axios';
 import { BACKEND_URL } from '@/config'; 
 import { useSelector } from 'react-redux';
 
@@ -21,9 +21,8 @@ const SuggestionsSidebar = () => {
 
   useEffect(() => {
     const fetchTags = async () => {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       try {
-        const response = await axios.get(`${BACKEND_URL}/api/blog/trending-tags`, config);
+        const response = await axiosInstance.get('/blog/trending-tags');
         setTrendingTags(response.data);
       } catch (error) {
         console.error(error);

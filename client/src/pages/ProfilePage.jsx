@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from '@/components/Navbar';
 import EditProfileForm from '@/components/EditProfileForm';
-import axios from 'axios';
+import axiosInstance from '@/api/axios';
 import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react';
 import { BACKEND_URL } from '@/config';
 import { useSelector } from 'react-redux';
@@ -15,12 +15,11 @@ const ProfilePage = () => {
   const [blogs, setBlogs] = useState([]); 
   const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.auth.token);
-  const config = { headers: { Authorization: `Bearer ${token}` } };
   const navigate = useNavigate();
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/user`, config);
+      const response = await axiosInstance.get('/user');
       setUser(response.data);
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -32,7 +31,7 @@ const ProfilePage = () => {
 
   const fetchUserBlogs = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/user/blogs`, config); 
+      const response = await axiosInstance.get('/user/blogs'); 
       setBlogs(response.data.blogs);
     } catch (error) {
       console.error("Error fetching user's blogs:", error);

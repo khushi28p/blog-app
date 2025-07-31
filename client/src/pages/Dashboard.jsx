@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import BlogPosts from "@/components/BlogPosts";
 import SuggestionsSidebar from "@/components/SuggestionsSidebar";
 import { Badge } from "@/components/ui/badge";
-import axios from "axios";
+import axiosInstance from "@/api/axios";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/config"; 
 import Navbar from "@/components/Navbar";
@@ -20,8 +20,8 @@ const Dashboard = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(
-          `${BACKEND_URL}/api/blog/trending-tags`, config 
+        const response = await axiosInstance.get(
+          '/blog/trending-tags'
         );
         setRandomTags(response.data);
       } catch (err) {

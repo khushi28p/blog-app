@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "@/api/axios";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ThumbsUp, MessageSquare } from "lucide-react";
@@ -61,8 +61,7 @@ const BlogPage = () => {
   const [renderedHtml, setRenderedHtml] = useState("");
   const [isLiked, setIsLiked] = useState(false);
 
-  const userToken = useSelector((state) => state.auth.token);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const {token, isLoggedIn} = useSelector((state) => state.auth);
 
   const fetchPost = async () => {
     if (!blogId) {
@@ -78,11 +77,7 @@ const BlogPage = () => {
 
       console.log("Frontend: Attempting to fetch blog with ID:", blogId);
 
-      const response = await axios.get(`${BACKEND_URL}/api/blog/${blogId}`, {
-        headers: {
-          ...(userToken && { Authorization: `Bearer ${userToken}` }),
-        },
-      });
+      const response = await axiosInstance.get(`/blog/${blogId}`);
       setPost(response.data);
 
       console.log("Fetched blog data:", response.data);
@@ -110,7 +105,7 @@ const BlogPage = () => {
 
   useEffect(() => {
     fetchPost();
-  }, [blogId, isLoggedIn, userToken]);
+  }, [blogId, isLoggedIn, token]);
 
   useEffect(() => {
     if (post?.content) {
@@ -152,7 +147,7 @@ const BlogPage = () => {
   }, [post]);
 
   const handleLike = async () => {
-    if (!isLoggedIn || !userToken) {
+    if (!isLoggedIn || !token) {
       toast.info("Please log in to like a blog.");
       return;
     }
@@ -165,14 +160,8 @@ const BlogPage = () => {
     console.log("Like Request sent to the backend");
 
     try {
-      await axios.post(
-        `${BACKEND_URL}/api/blog/${blogId}/like`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
+      await axiosInstance.post(
+        `/blog/${blogId}/like`
       );
       await fetchPost();
     } catch (err) {

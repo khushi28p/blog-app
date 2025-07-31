@@ -1,6 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
-import axios from 'axios'
-import { BACKEND_URL } from '@/config'
+import axiosInstance from '@/api/axios'
 
 const initialState = {
     comments: [],
@@ -13,7 +12,7 @@ export const fetchComments = createAsyncThunk(
     async(blogId, {rejectWithValue}) => {
         try{
             console.log("Fetching comments for blogId:", blogId);
-            const response = await axios.get(`${BACKEND_URL}/api/comments/${blogId}`);
+            const response = await axiosInstance.get(`/comments/${blogId}`);
             return response.data;
         }
         catch(error){
@@ -35,7 +34,7 @@ export const createComment = createAsyncThunk(
                 Authorization: `Bearer ${token}`
             }}
 
-            const response = await axios.post(`${BACKEND_URL}/api/comments/${blogId}`, {comment, parent}, config);
+            const response = await axiosInstance.post(`/comments/${blogId}`, {comment, parent});
             return response.data;
         } catch(error){
             return rejectWithValue(error.response.data);
@@ -51,14 +50,8 @@ export const updateComment = createAsyncThunk(
             if(!token){
                 return rejectWithValue({message: 'authentication token not found. please login,'});
             }
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            };
 
-            const response = await axios.put(`${BACKEND_URL}/api/comments/${commentId}`, { comment }, config);
+            const response = await axiosInstance.put(`/comments/${commentId}`, { comment });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -79,7 +72,7 @@ export const deleteComment = createAsyncThunk(
                     Authorization: `Bearer ${token}`,
                 },
             };
-            await axios.delete(`${BACKEND_URL}/api/comments/${commentId}`, config);
+            await axiosInstance.delete(`/comments/${commentId}`);
             return commentId;
         } catch(error){
             return rejectWithValue(error.response.data);
