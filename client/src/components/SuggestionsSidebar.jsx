@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import axios from 'axios';
 import { BACKEND_URL } from '@/config'; 
+import { useSelector } from 'react-redux';
 
 const SuggestionsSidebar = () => {
+  const { token } = useSelector((state) => state.auth);
   const [trendingTags, setTrendingTags] = useState([]);
 
   const tagColors = [
@@ -19,7 +21,6 @@ const SuggestionsSidebar = () => {
 
   useEffect(() => {
     const fetchTags = async () => {
-      const token = localStorage.getItem('userToken');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       try {
         const response = await axios.get(`${BACKEND_URL}/api/blog/trending-tags`, config);

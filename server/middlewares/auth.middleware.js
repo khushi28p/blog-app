@@ -1,8 +1,5 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
-import { config } from 'dotenv';
-
-config();
 
 export const auth = async(req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];

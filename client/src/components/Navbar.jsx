@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { SquarePen, Bell, CircleUser, Search } from "lucide-react";
+import { Bell, Search, PenLine } from "lucide-react";
 import { useSelector } from "react-redux";
 import { logout } from "../redux/authSlice.js";
 import { toast } from "sonner";
@@ -23,76 +23,87 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {isLoggedIn, user} = useSelector((state) => state.auth);
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    try{
-    dispatch(logout());
-    navigate("/");
-    toast("Logged out successfully");
-    } catch(error){
+    try {
+      dispatch(logout());
+      navigate("/");
+      toast.success("Logged out successfully");
+    } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Logout failed. Please try again.");
     }
-  }
+  };
 
   return (
-    <nav className="bg-background border-b border-border py-4 px-20 shadow-sm">
-      <div className="container mx-auto flex justify-between items-center gap-4 md:gap-8">
-        <div className="flex items-center gap-4 flex-grow">
-          {/* Logo/Brand Name */}
-          <a href="/" className="flex items-center space-x-2 shrink-0">
-            <span className="text-xl font-bold text-foreground">
+    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border py-3 shadow-sm">
+      <div className="container mx-auto flex justify-between items-center px-4 md:px-8 lg:px-12 xl:px-20 gap-4">
+        <div className="flex-shrink-0">
+          <Link to="/" className="flex items-center space-x-2 group">
+            <span className="text-2xl font-extrabold text-primary transition-colors group-hover:text-primary/90">
               QuillJot
             </span>
-          </a>
+          </Link>
+        </div>
 
-          {isLoggedIn && (
-            <div className="relative flex-grow max-w-sm">
+        {isLoggedIn && (
+          <div className="flex-grow flex justify-center mx-4">
+            <div className="relative w-full max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search blogs..."
-                className="w-full pl-9 pr-3 py-2 rounded-md"
+                className="w-full pl-9 pr-3 py-2 bg-input/80 border border-border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-200"
               />
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-      <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
+        <div className="flex items-center space-x-3 sm:space-x-5 flex-shrink-0">
           {isLoggedIn ? (
             <>
-              {/* Write Icon */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground"
+                className="h-9 w-9 text-muted-foreground hover:bg-accent/20 hover:text-accent-foreground transition-colors duration-200"
                 onClick={() => navigate("/editor")}
               >
-                <SquarePen className="h-6 w-6" />
+                <PenLine className="h-5 w-5" />
                 <span className="sr-only">Write a new blog</span>
               </Button>
 
-              {/* Notification Icon */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-muted-foreground hover:text-foreground"
+                className="relative h-9 w-9 text-muted-foreground hover:bg-accent/20 hover:text-accent-foreground transition-colors duration-200"
               >
-                <Bell className="h-6 w-6" />
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
                 <span className="sr-only">View notifications</span>
               </Button>
 
-              {/* User Avatar with Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar>
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <Avatar className="h-9 w-9">
                       <AvatarImage
-                        src={user?.profile_img}
+                        src={
+                          user?.profile_img ||
+                          `https://api.dicebear.com/7.x/initials/svg?seed=${
+                            user?.username || "User"
+                          }`
+                        }
                         alt="User Avatar"
                       />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {user?.username
+                          ? user.username.charAt(0).toUpperCase()
+                          : "U"}
+                      </AvatarFallback>
                     </Avatar>
                     <span className="sr-only">Open user menu</span>
                   </Button>
@@ -101,33 +112,70 @@ const Navbar = () => {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {user.username}
+                        {user?.username || "Guest"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
+                        {user?.email || "N/A"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem><Link to={'/profile'}>Profile</Link></DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-accent/20"
+                    onSelect={() => navigate("/profile")}
+                  >
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-accent/20"
+                    onSelect={() => navigate("/settings")}
+                  >
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
+                    onClick={handleLogout}
+                  >
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center space-x-6"> 
-            <a href="/about-us" className="text-foreground text-sm font-medium hidden md:inline-block">About Us</a>
-                          <a onClick={() => {
-              isLoggedIn ? navigate("/editor") : navigate("/login");
-            }} className="text-foreground text-sm font-medium hidden md:inline-block">Write</a>
-              <a href="/membership" className="text-foreground text-sm font-medium hidden md:inline-block">Membership</a>
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <Link
+                to="/about-us"
+                className="text-muted-foreground text-sm font-medium hidden md:inline-block hover:text-foreground transition-colors"
+              >
+                About Us
+              </Link>
+              <Link
+                to={isLoggedIn ? "/editor" : "/login"}
+                className="text-muted-foreground text-sm font-medium hidden md:inline-block hover:text-foreground transition-colors"
+              >
+                Write
+              </Link>
+              <Link
+                to="/membership"
+                className="text-muted-foreground text-sm font-medium hidden md:inline-block hover:text-foreground transition-colors"
+              >
+                Membership
+              </Link>
 
-              <Button onClick={() => navigate("/login")} variant="ghost" className="hidden sm:inline-flex font-semibold">
+              <Button
+                onClick={() => navigate("/login")}
+                variant="ghost"
+                className="hidden sm:inline-flex font-semibold text-primary hover:bg-primary/10 hover:text-primary transition-colors"
+              >
                 Sign In
               </Button>
-              <Button onClick={() => navigate("/signup")} className="hidden sm:inline-flex">Get Started</Button>
+              <Button
+                onClick={() => navigate("/signup")}
+                className="hidden sm:inline-flex px-6 py-2.5 font-semibold shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                Get Started
+              </Button>
             </div>
           )}
         </div>

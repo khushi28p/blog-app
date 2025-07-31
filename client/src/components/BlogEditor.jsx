@@ -25,6 +25,7 @@ import EditorMenubar from "./EditorMenubar";
 import EditorNavbar from "./EditorNavbar";
 
 import { useDispatch } from 'react-redux';
+import { useSelector } from "react-redux";
 import { setBlogForPublish } from '@/redux/blogSlice.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -70,6 +71,8 @@ const BlogEditor = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const {token} = useSelector((state) => state.auth);
+
     const bannerInputRef = useRef(null);
 
     const editor = useEditor({
@@ -105,7 +108,6 @@ const BlogEditor = () => {
 
             setLoadingBanner(true);
             try {
-                const token = localStorage.getItem('userToken');
                 const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
                 const response = await axios.post(`${BACKEND_URL}/api/upload-image`, formData, config);
@@ -160,7 +162,6 @@ const BlogEditor = () => {
 
         try {
             toast.loading("Saving draft...", { id: 'save-draft' });
-            const token = localStorage.getItem('userToken');
             const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
             const dataToSave = {
@@ -189,7 +190,6 @@ const BlogEditor = () => {
             console.error("Error saving draft:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to save draft.");
             if (error.response?.status === 401) {
-                localStorage.removeItem('userToken');
                 navigate("/login");
             }
         }

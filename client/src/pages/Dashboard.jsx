@@ -6,15 +6,16 @@ import axios from "axios";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/config"; 
 import Navbar from "@/components/Navbar";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
   const [randomTags, setRandomTags] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchRandomTags = async () => {
-      const token = localStorage.getItem('userToken');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       try {
         setLoading(true);

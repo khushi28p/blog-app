@@ -7,6 +7,8 @@ import imageRouter from "./routes/image.routes.js";
 import blogRouter from "./routes/blog.routes.js";
 import userRouter from "./routes/user.routes.js";
 import commentRouter from "./routes/comment.routes.js";
+import compression from "compression";
+import { authLimiter, apiLimiter } from "./middlewares/authRateLimiter.middleware.js";
 
 dotenv.config();
 
@@ -22,9 +24,13 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use(compression());
+
 const PORT = process.env.PORT;
   
-app.use("/api/auth", authRoutes);
+app.use("/api/", apiLimiter);
+app.use("/api/auth", authLimiter, authRoutes);
+
 app.use('/api/upload-image', imageRouter);
 app.use("/api/blog", blogRouter);
 app.use('/api/user', userRouter);

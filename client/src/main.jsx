@@ -5,11 +5,8 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store.js";
-import { loadUserFromLocalStorage } from "./redux/authSlice.js";
 import { Toaster } from "sonner";
 import { PersistGate } from "redux-persist/integration/react";
-
-store.dispatch(loadUserFromLocalStorage());
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

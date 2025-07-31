@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 const PublishPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { token } = useSelector((state) => state.auth);
 
     const { title, bannerImageUrl, htmlContent, jsonContent, description, tags } = useSelector(
         (state) => state.blog
@@ -45,7 +46,6 @@ const PublishPage = () => {
     };
 
     const getAuthHeaders = () => {
-        const token = localStorage.getItem('userToken');
         if (!token) {
             toast.error("Authentication required. Please log in.");
             navigate("/login");

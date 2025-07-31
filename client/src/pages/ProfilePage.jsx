@@ -8,12 +8,13 @@ import EditProfileForm from '@/components/EditProfileForm';
 import axios from 'axios';
 import { Mail, MapPin, Globe, Youtube, Instagram, Facebook, Twitter, Github } from 'lucide-react';
 import { BACKEND_URL } from '@/config';
+import { useSelector } from 'react-redux';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]); 
   const [isEditing, setIsEditing] = useState(false);
-  const token = localStorage.getItem('userToken');
+  const token = useSelector((state) => state.auth.token);
   const config = { headers: { Authorization: `Bearer ${token}` } };
   const navigate = useNavigate();
 
