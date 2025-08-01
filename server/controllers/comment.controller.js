@@ -31,16 +31,23 @@ export const createComment = async (req, res) => {
         parent: parent,
       });
 
-      parentComment.children.push(newComment._id);
-      await parentComment.save();
+      await Comment.findbyIdAndUpdate(
+        parent,
+        { $push: { children: newComment._id } },
+        { new: true, runValidators: true }
+      );
 
-      blog.activity.total_comments += 1;
-      await blog.save();
+      await Blog.findByIdAndUpdate(
+        blog._id,
+        { $inc: { "activity.total_comments": 1 } },
+        { new: true, runValidators: true }
+      );
 
       await newComment.populate(
         "commented_by",
         "personal_info.username personal_info.profile_img"
       );
+
       return res.status(201).json(newComment);
     } else {
       newComment = await Comment.create({
@@ -52,15 +59,23 @@ export const createComment = async (req, res) => {
         parent: null,
       });
 
-      blog.comments.push(newComment._id);
-      blog.activity.total_comments += 1;
-      blog.activity.total_parent_comments += 1;
-      await blog.save();
+      await Blog.findByIdAndUpdate(
+        blog._id,
+        {
+          $push: { comments: newComment._id },
+          $inc: {
+            "activity.total_comments": 1,
+            "activity.total_parent_comments": 1,
+          },
+        },
+        { new: true, runValidators: true }
+      );
 
       await newComment.populate(
         "commented_by",
         "personal_info.username personal_info.profile_img"
       );
+
       return res.status(201).json(newComment);
     }
   } catch (error) {
@@ -76,7 +91,10 @@ export const getCommentByBlog = async (req, res) => {
 
   try {
     let comments = await Comment.find({ blog_id: blogId, parent: null })
-      .populate("commented_by", "personal_info.username personal_info.profile_img")
+      .populate(
+        "commented_by",
+        "personal_info.username personal_info.profile_img"
+      )
       .populate({
         path: "children",
         populate: [
@@ -90,7 +108,7 @@ export const getCommentByBlog = async (req, res) => {
               path: "commented_by",
               select: "personal_info.username personal_info.profile_img",
             },
-            options: { sort: { commentedAt: 1 } }
+            options: { sort: { commentedAt: 1 } },
           },
         ],
         options: { sort: { commentedAt: 1 } },
@@ -154,38 +172,34 @@ export const deleteComment = async (req, res) => {
         .json({ message: "Not authorized to delete this comment." });
     }
 
-    const blog = await Blog.findById(comment.blog_id);
-    if (blog) {
-      blog.comments = blog.comments.filter(
-        (cId) => cId.toString() !== commentId.toString()
-      );
-      blog.activity.total_comments -= 1;
-      if (!comment.isReply) {
-        blog.activity.total_parent_comments -= 1;
-      }
-      await blog.save();
+    const blogUpdate = { $inc: {} };
+    if (!comment.isReply) {
+      blogUpdate.$inc["activity.total_parent_comments"] = -1;
+      blogUpdate.$pull = { comments: commentId };
     }
+    blogUpdate.$inc["activity.total_comments"] = -1;
+
+    await Blog.findByIdAndUpdate(comment.blog_id, blogUpdate, { new: true });
 
     if (comment.children && comment.children.length > 0) {
+      const numChildrenDeleted = comment.children.length;
       await Comment.deleteMany({ _id: { $in: comment.children } });
 
-      if (blog) {
-        blog.activity.total_comments -= comment.children.length;
-        await blog.save();
-      }
+      await Blog.findByIdAndUpdate(comment.blog_id, {
+        $inc: { "activity.total_comments": -numChildrenDeleted },
+      });
     }
 
     if (comment.isReply && comment.parent) {
-      const parentComment = await Comment.findById(comment.parent);
-      if (parentComment) {
-        parentComment.children = parentComment.children.filter(
-          (childId) => childId.toString() !== commentId.toString()
-        );
-        await parentComment.save();
-      }
+      await Comment.findByIdAndUpdate(
+        comment.parent,
+        { $pull: { children: commentId } },
+        { new: true }
+      );
     }
 
     await comment.deleteOne();
+
     res.status(200).json({ message: "Comment removed successfully." });
   } catch (error) {
     console.error("Error deleting comment:", error);

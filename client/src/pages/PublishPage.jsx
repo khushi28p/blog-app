@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axiosInstance from '@/api/axios';
-import { BACKEND_URL } from '@/config';
 
 import {
     updatePublishTags,
