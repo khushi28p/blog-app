@@ -11,7 +11,6 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import { BACKEND_URL } from '@/config';
 
 import { ThumbsUp, MessageSquare, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';

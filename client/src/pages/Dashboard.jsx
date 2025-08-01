@@ -1,84 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BlogPosts from "@/components/BlogPosts";
 import SuggestionsSidebar from "@/components/SuggestionsSidebar";
-import { Badge } from "@/components/ui/badge";
-import axiosInstance from "@/api/axios";
-import { toast } from "sonner";
-import { BACKEND_URL } from "@/config"; 
+
 import Navbar from "@/components/Navbar";
 import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-  const [randomTags, setRandomTags] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  const userName = user?.fullname || user?.username || "Reader";
 
-  useEffect(() => {
-    const fetchRandomTags = async () => {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axiosInstance.get(
-          '/blog/trending-tags'
-        );
-        setRandomTags(response.data);
-      } catch (err) {
-        console.error("Error fetching random tags:", err);
-        setError("Failed to load tags.");
-        toast.error("Failed to load trending tags.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRandomTags();
-  }, []);
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+
+    if(hour < 12){
+      return "Good Morning";
+    }
+    if(hour < 18){
+      return "Good Afternoon";
+    }
+    return "Good Evening";
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-background via-card to-background text-foreground font-inter">
       <Navbar />
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col lg:flex-row lg:gap-8">
-          <div className="lg:w-3/4">
-          <div className="mb-6 text-center">
-            {loading ? (
-              <p className="text-lg text-gray-500">Loading popular topics...</p>
-            ) : error ? (
-              <p className="text-lg text-red-500">{error}</p>
-            ) : randomTags.length > 0 ? (
-              <div className="relative">
-                {" "}
-                <div className="flex gap-2 py-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-                  {randomTags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="text-md px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200 transition-colors shrink-0 snap-center" 
-                    >
-                      #{tag}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
-              </div>
-            ) : (
-              <p className="text-lg text-gray-500">
-                No popular tags to display yet.
-              </p>
-            )}
+      <div className="container mx-auto py-8 px-4 sm:px-6 md:px-8 lg:px-12 flex-grow">
+        <div className="mb-6 px-8 md:px-14 md:py-4">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground leading-tight mb-2 drop-shadow-md">
+            {getTimeBasedGreeting()}, {userName}!
+          </h1>
+        </div>
+        <div className="flex flex-col lg:flex-row lg:gap-8">
+          <div className="lg:w-3/4 flex-grow">
+            <BlogPosts />
           </div>
 
-          <BlogPosts />
-        </div>
-
-        <div className="lg:w-1/4 mt-8 lg:mt-0">
-          <SuggestionsSidebar />
+          <div className="lg:w-1/4 mt-8 lg:mt-0 flex flex-col">
+            <h2 className="text-2xl font-bold mb-6 text-foreground hidden lg:block">
+              Discover
+            </h2>
+            <SuggestionsSidebar />
+          </div>
         </div>
       </div>
     </div>
-    </div>  
   );
 };
 
