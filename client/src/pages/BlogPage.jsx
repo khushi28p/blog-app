@@ -4,7 +4,6 @@ import axiosInstance from "@/api/axios";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ThumbsUp, MessageSquare } from "lucide-react";
-import { BACKEND_URL } from "@/config";
 import CommentSection from "@/components/CommentSection";
 
 import { generateHTML } from "@tiptap/html";
@@ -75,12 +74,8 @@ const BlogPage = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Frontend: Attempting to fetch blog with ID:", blogId);
-
       const response = await axiosInstance.get(`/blog/${blogId}`);
       setPost(response.data);
-
-      console.log("Fetched blog data:", response.data);
 
       if (
         response.data &&
@@ -95,7 +90,6 @@ const BlogPage = () => {
         );
       }
     } catch (err) {
-      console.error("Frontend: Error fetching blog post:", err);
       setError(err.response?.data?.message || "Failed to load blog post.");
       toast.error(err.response?.data?.message || "Failed to load blog post.");
     } finally {
@@ -156,8 +150,6 @@ const BlogPage = () => {
       toast.error("Cannot like: Blog ID is missing from URL.");
       return;
     }
-
-    console.log("Like Request sent to the backend");
 
     try {
       await axiosInstance.post(

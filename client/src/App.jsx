@@ -33,6 +33,7 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/edit-profile" element={<EditProfileModal />} />
       <Route path="*" element={<p>404 Not Found</p>} />
+      <Route path="/profile/*" element={<p>Under work</p>} />
       </Routes>
     </>
   )

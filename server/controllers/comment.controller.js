@@ -31,7 +31,7 @@ export const createComment = async (req, res) => {
         parent: parent,
       });
 
-      await Comment.findbyIdAndUpdate(
+      await Comment.findByIdAndUpdate(
         parent,
         { $push: { children: newComment._id } },
         { new: true, runValidators: true }
