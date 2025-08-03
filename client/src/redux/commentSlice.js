@@ -16,7 +16,7 @@ export const fetchComments = createAsyncThunk(
             return response.data;
         }
         catch(error){
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 )
@@ -29,15 +29,11 @@ export const createComment = createAsyncThunk(
             if(!token){
                 return rejectWithValue({message: 'Auhtentication token not found. PLEASe login.'});
             }
-            const config = {headers:{
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            }}
 
             const response = await axiosInstance.post(`/comments/${blogId}`, {comment, parent});
             return response.data;
         } catch(error){
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 )
@@ -54,7 +50,7 @@ export const updateComment = createAsyncThunk(
             const response = await axiosInstance.put(`/comments/${commentId}`, { comment });
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 )
@@ -67,15 +63,11 @@ export const deleteComment = createAsyncThunk(
             if (!token) {
                 return rejectWithValue({ message: 'Authentication token not found. Please log in.' });
             }
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
+            
             await axiosInstance.delete(`/comments/${commentId}`);
             return commentId;
         } catch(error){
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 )

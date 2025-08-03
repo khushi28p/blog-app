@@ -27,7 +27,7 @@ export const signupUser = createAsyncThunk(
   "auth/signupUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/auth/signup', {
+      const response = await axiosInstance.post('/auth/signup', {
         personal_info: credentials,
       });
       return response.data;
@@ -61,6 +61,10 @@ const authSlice = createSlice({
       localStorage.removeItem('userToken');
             localStorage.removeItem('user');
     },
+    setUserData: (state, action) => {
+      state.user = action.payload;
+      localStorage.setItem('user', JSON.stringify(action.payload));
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -95,6 +99,9 @@ const authSlice = createSlice({
       .addCase(signupUser.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.isLoggedIn = false;
+        state.user = null;
+        state.token = null;
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
@@ -106,5 +113,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setUserData } = authSlice.actions;
 export default authSlice.reducer;

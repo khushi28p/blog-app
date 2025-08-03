@@ -1,8 +1,7 @@
-import React, { useState, useRef} from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { BACKEND_URL } from "@/config.js";  
 import axiosInstance from "@/api/axios";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -12,20 +11,19 @@ import Placeholder from "@tiptap/extension-placeholder";
 
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
-import TextAlign from '@tiptap/extension-text-align'; 
-import Link from '@tiptap/extension-link';          
-import Table from '@tiptap/extension-table';         
+import TextAlign from '@tiptap/extension-text-align';
+import { Link as TiptapLinkExtension } from '@tiptap/extension-link'; 
+import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import Subscript from '@tiptap/extension-subscript';
-import Superscript from '@tiptap/extension-superscript'; 
+import Superscript from '@tiptap/extension-superscript';
 
 import EditorMenubar from "./EditorMenubar";
 import EditorNavbar from "./EditorNavbar";
 
-import { useDispatch } from 'react-redux';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux'; 
 import { setBlogForPublish } from '@/redux/blogSlice.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,7 +43,7 @@ const extensions = [
     TextAlign.configure({
         types: ['heading', 'paragraph'],
     }),
-    Link.configure({
+    TiptapLinkExtension.configure({
         openOnClick: false,
         autolink: true,
         defaultProtocol: 'https',
@@ -71,17 +69,23 @@ const BlogEditor = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const {token} = useSelector((state) => state.auth);
+    const { token } = useSelector((state) => state.auth); 
 
-    const bannerInputRef = useRef(null);
+    const bannerInputRef = useRef(null); 
 
     const editor = useEditor({
         extensions,
-        content: '<p></p>',
+        content: '<p></p>', 
         onUpdate: ({ editor }) => {
-
         },
     });
+
+    useEffect(() => {
+        if (!token) {
+            toast.error("You need to be logged in to create or edit a blog.");
+            navigate('/login');
+        }
+    }, [token, navigate]); 
 
     const handleTitleChange = (e) => {
         setTitle(e.target.value);
@@ -96,7 +100,7 @@ const BlogEditor = () => {
     };
 
     const handleBannerUploadClick = () => {
-        bannerInputRef.current?.click();
+        bannerInputRef.current?.click(); 
     };
 
     const handleBannerFileChange = async (e) => {
@@ -104,19 +108,17 @@ const BlogEditor = () => {
         if (file) {
             setBannerFile(file);
             const formData = new FormData();
-            formData.append('image', file);
+            formData.append('image', file); 
 
             setLoadingBanner(true);
             try {
-                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-
                 const response = await axiosInstance.post('/upload-image', formData);
                 const url = response.data.url;
                 setBannerImageUrl(url);
                 toast.success("Banner image uploaded successfully!");
             } catch (error) {
                 console.error("Banner image upload failed:", error);
-                toast.error("Failed to upload banner image.");
+                toast.error(error.response?.data?.message || "Failed to upload banner image.");
                 setBannerFile(null);
                 setBannerImageUrl('');
             } finally {
@@ -126,14 +128,16 @@ const BlogEditor = () => {
     };
 
     const handlePublishClick = () => {
-        if (!editor) return;
+        if (!editor) return; 
 
         if (!title.trim()) {
             toast.error("Blog title is required!");
             return;
         }
-        const htmlContent = editor.getHTML();
-        const jsonContent = editor.getJSON();
+
+        const htmlContent = editor.getHTML(); 
+        const jsonContent = editor.getJSON(); 
+
         if (!jsonContent || !jsonContent.content || jsonContent.content.length === 0 || editor.isEmpty) {
             toast.error("Blog content cannot be empty!");
             return;
@@ -143,13 +147,13 @@ const BlogEditor = () => {
 
         dispatch(setBlogForPublish({
             title,
-            bannerImageUrl: showBannerInput ? bannerImageUrl : '',
-            htmlContent,
-            jsonContent,
+            bannerImageUrl: showBannerInput ? bannerImageUrl : '', 
+            htmlContent, 
+            jsonContent, 
             description: derivedDescription,
         }));
 
-        navigate('/publish');
+        navigate('/publish'); 
     };
 
     const handleSaveDraftClick = async () => {
@@ -162,17 +166,16 @@ const BlogEditor = () => {
 
         try {
             toast.loading("Saving draft...", { id: 'save-draft' });
-            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
             const dataToSave = {
                 title,
-                jsonContent: editor.getJSON(),
-                banner: showBannerInput ? bannerImageUrl : '',
-                des: extractPlainTextDescription(editor.getHTML(), 180),
+                content: editor.getJSON(), 
+                banner: showBannerInput ? bannerImageUrl : '', 
+                des: extractPlainTextDescription(editor.getHTML(), 180), 
                 tags: [], 
             };
 
-            if(currentDraftId){
+            if (currentDraftId) {
                 dataToSave.blog_id = currentDraftId;
             }
 
@@ -190,7 +193,7 @@ const BlogEditor = () => {
             console.error("Error saving draft:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to save draft.");
             if (error.response?.status === 401) {
-                navigate("/login");
+                navigate("/login"); 
             }
         }
     };
@@ -200,26 +203,26 @@ const BlogEditor = () => {
     }
 
     return (
-        <div>
-            <EditorNavbar
+        <div className="bg-background text-foreground min-h-screen">
+            <EditorNavbar 
                 handleSaveDraft={handleSaveDraftClick}
                 handlePublish={handlePublishClick}
             />
             <div className="container max-w-3xl mx-auto py-8 px-6 space-y-4">
-                
+
                 <div className="flex items-center gap-2">
                     <Input
                         type="text"
                         placeholder="Blog Title"
-                        value={title}   
+                        value={title}
                         onChange={handleTitleChange}
-                        className="font-bold p-4 border-b-2 focus:outline-none focus:border-blue-500 flex-grow"
+                        className="font-bold p-4 border-b-2 border-input focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary flex-grow text-foreground bg-background" 
                     />
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={toggleBannerInput}
-                        className="shrink-0"
+                        className="shrink-0 text-muted-foreground hover:text-primary transition-colors" 
                         title={showBannerInput ? "Hide Banner Input" : "Add Banner Image"}
                     >
                         {showBannerInput ? (
@@ -235,13 +238,13 @@ const BlogEditor = () => {
                 </div>
 
                 {showBannerInput && (
-                    <div className="relative w-full h-60 border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <div className="relative w-full h-60 border border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center"> 
                         {bannerImageUrl ? (
                             <img src={bannerImageUrl} alt="Banner" className="w-full h-full object-cover" />
                         ) : loadingBanner ? (
-                            <p>Uploading banner...</p>
+                            <p className="text-muted-foreground">Uploading banner...</p> 
                         ) : (
-                            <p className="text-gray-500">No banner image selected</p>
+                            <p className="text-muted-foreground">No banner image selected</p> 
                         )}
                         <input
                             type="file"
@@ -252,7 +255,7 @@ const BlogEditor = () => {
                         />
                         <Button
                             onClick={handleBannerUploadClick}
-                            className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white"
+                            className="absolute bottom-4 right-4 bg-primary hover:bg-primary/90 text-primary-foreground" 
                             disabled={loadingBanner}
                         >
                             {loadingBanner ? 'Uploading...' : 'Upload Banner'}
@@ -262,10 +265,10 @@ const BlogEditor = () => {
 
                 <EditorMenubar editor={editor} />
 
-                <div className="prose max-w-none border rounded-lg p-4 min-h-[300px] overflow-auto editor-content">
+                <div className="prose max-w-none border border-border rounded-lg p-4 min-h-[300px] overflow-auto editor-content bg-card text-foreground">
                     <EditorContent editor={editor} />
                 </div>
-                
+
             </div>
         </div>
     );
