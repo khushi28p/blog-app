@@ -92,16 +92,16 @@ const Navbar = () => {
                     <Avatar className="h-9 w-9">
                       <AvatarImage
                         src={
-                          user?.profile_img ||
+                          user.personal_info?.profile_img ||
                           `https://api.dicebear.com/7.x/initials/svg?seed=${
-                            user?.username || "User"
+                            user.personal_info?.username || "User"
                           }`
                         }
                         alt="User Avatar"
                       />
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {user?.username
-                          ? user.username.charAt(0).toUpperCase()
+                          ? user.personal_info.username.charAt(0).toUpperCase()
                           : "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -112,10 +112,10 @@ const Navbar = () => {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {user?.username || "Guest"}
+                        {user.personal_info?.username || "Guest"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email || "N/A"}
+                        {user.personal_info?.email || "N/A"}
                       </p>
                     </div>
                   </DropdownMenuLabel>

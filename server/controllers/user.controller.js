@@ -21,23 +21,26 @@ export const getUserDetails = async (req, res) => {
 
 export const updateUserDetails = async (req, res) => {
   const userId = req.user._id;
-  const { fullname, username, bio, profile_img, social_links } = req.body;
+const { personal_info, social_links } = req.body;
 
   try {
     const updateFields = {};
 
-    if (fullname !== undefined) {
-      updateFields["personal_info.fullname"] = fullname;
+    if (personal_info) {
+      if (personal_info.fullname !== undefined) {
+        updateFields["personal_info.fullname"] = personal_info.fullname;
+      }
+      if (personal_info.username !== undefined) {
+        updateFields["personal_info.username"] = personal_info.username;
+      }
+      if (personal_info.bio !== undefined) {
+        updateFields["personal_info.bio"] = personal_info.bio;
+      }
+      if (personal_info.profile_img !== undefined) {
+        updateFields["personal_info.profile_img"] = personal_info.profile_img;
+      }
     }
-    if (username !== undefined) {
-      updateFields["personal_info.username"] = username;
-    }
-    if (bio !== undefined) {
-      updateFields["personal_info.bio"] = bio;
-    }
-    if (profile_img !== undefined) {
-      updateFields["personal_info.profile_img"] = profile_img;
-    }
+
     if (social_links) {
       if (social_links.youtube !== undefined) {
         updateFields["social_links.youtube"] = social_links.youtube;
@@ -69,11 +72,13 @@ export const updateUserDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    res.status(200).json({
-      status: "success",
-      message: "User details updated successfully",
-      user: updatedUser,
-    });
+    const userToSend = updatedUser.toObject();
+
+        res.status(200).json({
+            status: 'success',
+            message: 'User details updated successfully',
+            user: userToSend 
+        });
   } catch (error) {
     console.error("Error updating user details:", error);
 

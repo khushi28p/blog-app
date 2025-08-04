@@ -89,21 +89,17 @@ const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
         setErrorMessage("");
         setIsSaving(true);
 
-        if (!token) {
-            setErrorMessage("Authentication token not found. Please log in again.");
-            setIsSaving(false);
-            return;
-        }
+        if (!token) { /* ... */ return; }
 
         const updateData = {
             personal_info: {
                 username,
                 fullname,
-                bio,
-                profile_img: profileImg, 
+                bio, // This is the local 'bio' state
+                profile_img: profileImg,
             },
             social_links: {
-                website,
+                website, // These are the local social links states
                 youtube,
                 instagram,
                 facebook,
@@ -112,14 +108,19 @@ const EditProfileForm = ({ user, onUpdateSuccess, onCancel }) => {
             },
         };
 
+        console.log("Frontend (EditProfileForm): Data being sent to backend:", updateData);
+
+        // ⭐ ADD THIS CRUCIAL LOG: See what updateData contains before sending
+        console.log("EditProfileForm: Data being sent to backend:", updateData);
+
         try {
-            const response = await axiosInstance.put('/user/update-user', updateData); 
+            const response = await axiosInstance.put('/user/update-user', updateData);
 
             if (response.data.status === "success") {
                 toast.success(response.data.message || "Profile updated successfully!");
-                 dispatch(setUserData(response.data.user));
+                dispatch(setUserData(response.data.user)); // Dispatch updated user to Redux
                 if (onUpdateSuccess) {
-                    onUpdateSuccess(); 
+                    onUpdateSuccess();
                 }
             } else {
                 setErrorMessage(response.data.message || "Failed to update profile.");
